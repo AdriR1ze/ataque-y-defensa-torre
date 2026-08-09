@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://ddpirt3vjdypy"]
+
+[ext_resource type="Script" uid="uid://cd7dd0ge06vwy" path="res://src/gameplay/camera/camera_3d.gd" id="1_qlngd"]
+
+[node name="Camera3D" type="Camera3D" unique_id=1388596022]
+script = ExtResource("1_qlngd")
+distance = null
+height = null
+follow_speed = null
+mouse_sensitivity = null
+min_pitch = null
+max_pitch = null
+zoom_speed = null
+min_distance = null
+max_distance = null
