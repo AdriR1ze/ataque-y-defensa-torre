@@ -8,8 +8,10 @@ var _current_level : BaseLevel
 @onready var effects_root = %EffectsRoot
 @onready var level_root = %LevelRoot
 
+@onready var level_1 = "res://src/levels/level_1.tscn"
 func _ready() -> void:
 	_init_player()
+	load_level("res://src/levels/level_1.tscn")
 	
 	
 func _init_player() -> void:
@@ -24,6 +26,7 @@ func _init_player() -> void:
 	entity_root.add_child(player)
 
 func load_level(level_scene : String) -> void:
+	print(level_scene)
 	_deferred_load_level.call_deferred(level_scene)
 	
 	
@@ -37,10 +40,11 @@ func _deferred_load_level(level_scene : String):
 		push_error("Couldnt load new level")
 		return
 	_current_level = new_level.instantiate() as BaseLevel
+	level_root.add_child(_current_level)
 	if _current_level == null:
 		push_error("Couldnt instantiate the current level")
 		return
-	
+			
 	await get_tree().process_frame
 	_place_player_at_level_spawn()
 

@@ -1,3 +1,34 @@
 [gd_scene format=3 uid="uid://dsbjdx6dprvow"]
 
+[ext_resource type="Script" uid="uid://se6jetefui18" path="res://src/levels/level_1.gd" id="1_un1bx"]
+
+[sub_resource type="Environment" id="Environment_u5ev4"]
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_iygna"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_un1bx"]
+size = Vector3(183.72073, 0.06994629, 315.31723)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kg615"]
+size = Vector3(181.13173, 1, 313.30377)
+
 [node name="Level1" type="Node3D" unique_id=381462931]
+script = ExtResource("1_un1bx")
+player_spawn = Vector3(10, 100, 10)
+nombre_level = "Level 1"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=211238122]
+environment = SubResource("Environment_u5ev4")
+camera_attributes = SubResource("CameraAttributesPractical_iygna")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=1871628194]
+transform = Transform3D(1, 0, 0, 0, 0.48830837, 0.8726713, 0, -0.8726713, 0.48830837, 0, 51.35691, 68.45819)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=125691580]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1819161281]
+mesh = SubResource("BoxMesh_un1bx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=47813880]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4937973, 0, 0.9874573)
+shape = SubResource("BoxShape3D_kg615")

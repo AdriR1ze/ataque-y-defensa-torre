@@ -3,6 +3,10 @@
 [ext_resource type="Script" uid="uid://cbyws34liyecw" path="res://src/core/main_game/main_game.gd" id="1_3fed5"]
 [ext_resource type="PackedScene" uid="uid://ucblt1tlt68g" path="res://src/ui/debug_text_overlay.tscn" id="2_6yl8a"]
 
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_u177a"]
+radius = 3.5756836
+height = 7.151367
+
 [node name="MainGame" type="Node" unique_id=433348220]
 process_mode = 3
 script = ExtResource("1_3fed5")
@@ -14,6 +18,10 @@ process_mode = 1
 
 [node name="EntityRoot" type="Node3D" parent="World" unique_id=1889090787]
 unique_name_in_owner = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="World/EntityRoot" unique_id=1328956419]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.157526, 5.4865522, -7.864975)
+mesh = SubResource("CapsuleMesh_u177a")
 
 [node name="EffectsRoot" type="Node3D" parent="World" unique_id=1024009966]
 unique_name_in_owner = true
