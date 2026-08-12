@@ -5,7 +5,6 @@
 [ext_resource type="Script" uid="uid://b674qjf214k4s" path="res://src/core/components/movement_component.gd" id="3_k2146"]
 [ext_resource type="Script" uid="uid://don7tt6hx7ojl" path="res://src/core/components/camera_component.gd" id="3_sjr3t"]
 [ext_resource type="Script" uid="uid://b4g7sgnuigrj" path="res://src/core/components/weapon_component.gd" id="6_dxsvo"]
-[ext_resource type="Script" uid="uid://r8flawm71whu" path="res://src/core/components/health_component.gd" id="7_health"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_u177a"]
 
@@ -13,7 +12,6 @@
 radius = 0.55
 
 [node name="Player" type="CharacterBody3D" unique_id=1697414130]
-collision_layer = 2
 script = ExtResource("1_script")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=500272197]
@@ -37,8 +35,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.35, -0.7)
 
 [node name="WeaponComponent" type="Node" parent="." unique_id=1741450054]
 script = ExtResource("6_dxsvo")
-
-[node name="HealthComponent" type="Node" parent="." unique_id=920184736]
-script = ExtResource("7_health")
-
-[node name="RayCast3D" type="RayCast3D" parent="." unique_id=571304559]

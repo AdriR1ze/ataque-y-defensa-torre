@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dsbjdx6dprvow"]
 
 [ext_resource type="Script" uid="uid://se6jetefui18" path="res://src/levels/level_1.gd" id="1_un1bx"]
+[ext_resource type="PackedScene" uid="uid://idwmj887361c" path="res://src/gameplay/enemies/enemy.tscn" id="2_enemy"]
 
 [sub_resource type="Environment" id="Environment_u5ev4"]
 
@@ -25,10 +26,15 @@ camera_attributes = SubResource("CameraAttributesPractical_iygna")
 transform = Transform3D(1, 0, 0, 0, 0.48830837, 0.8726713, 0, -0.8726713, 0.48830837, 0, 51.35691, 68.45819)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=125691580]
+collision_mask = 7
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1819161281]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3750315, -2.2929144, 1.4792914)
 mesh = SubResource("BoxMesh_un1bx")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=47813880]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4937973, 0, 0.9874573)
 shape = SubResource("BoxShape3D_kg615")
+
+[node name="Enemy" parent="." unique_id=304881726 instance=ExtResource("2_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08606815, 1.5, 3.97509)

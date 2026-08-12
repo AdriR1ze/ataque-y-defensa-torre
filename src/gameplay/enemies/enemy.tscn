@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://idwmj887361c"]
+
+[ext_resource type="Script" uid="uid://b1inscw1nskc1" path="res://src/gameplay/enemies/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" uid="uid://r8flawm71whu" path="res://src/core/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" uid="uid://j05kvmf4lwws" path="res://src/core/components/hitbox_component.gd" id="3_hitbox"]
+[ext_resource type="Script" path="res://src/core/components/health_bar_component.gd" id="4_healthbar"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u177a"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tdeca"]
+albedo_color = Color(1, 0.43529412, 1, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_u177a"]
+material = SubResource("StandardMaterial3D_tdeca")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_attack"]
+size = Vector3(1.4, 1.6, 1.4)
+
+[node name="Enemy" type="CharacterBody3D" unique_id=747958128]
+collision_layer = 4
+script = ExtResource("1_enemy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1638285643]
+shape = SubResource("CapsuleShape3D_u177a")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=300099415]
+mesh = SubResource("CapsuleMesh_u177a")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=483920175]
+script = ExtResource("2_health")
+max_health = 50.0
+
+[node name="HitboxComponent" type="Area3D" parent="." unique_id=772304918]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("3_hitbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitboxComponent" unique_id=610558294]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -1)
+shape = SubResource("BoxShape3D_attack")
+
+[node name="HealthBar" type="Node3D" parent="." unique_id=291634080]
+script = ExtResource("4_healthbar")
