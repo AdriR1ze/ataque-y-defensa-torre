@@ -21,7 +21,7 @@ enum EnemyState {
 
 var state: EnemyState = EnemyState.IDLE
 
-var _target: Player
+var _target: Node3D
 var _attack_timer := 0.0
 var _knockback_velocity := Vector3.ZERO
 var _flash_tween: Tween
@@ -89,7 +89,11 @@ func _physics_process(delta: float) -> void:
 
 
 func _find_target() -> void:
-	_target = get_tree().get_first_node_in_group("player") as Player
+	var base := get_tree().get_first_node_in_group("base") as Node3D
+	if base != null:
+		_target = base
+		return
+	_target = get_tree().get_first_node_in_group("player") as Node3D
 
 
 func _chase() -> void:
@@ -138,6 +142,10 @@ func _apply_gravity(delta: float) -> void:
 func take_damage(amount: float) -> void:
 	health_component.take_damage(amount)
 	_apply_knockback()
+
+
+func take_trap_damage(amount: float) -> void:
+	health_component.take_damage(amount)
 
 
 func _apply_knockback() -> void:

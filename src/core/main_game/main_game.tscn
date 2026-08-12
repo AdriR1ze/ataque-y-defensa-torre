@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cbyws34liyecw" path="res://src/core/main_game/main_game.gd" id="1_3fed5"]
 [ext_resource type="PackedScene" uid="uid://ucblt1tlt68g" path="res://src/ui/debug_text_overlay.tscn" id="2_6yl8a"]
+[ext_resource type="Script" uid="uid://vg00mb2kgj3r" path="res://src/gameplay/traps/trap_manager.gd" id="3_trapmgr"]
 
 [node name="MainGame" type="Node" unique_id=433348220]
 process_mode = 3
@@ -10,6 +11,7 @@ script = ExtResource("1_3fed5")
 [node name="System" type="Node" parent="." unique_id=1801437223]
 
 [node name="TrapManager" type="Node" parent="System" unique_id=962725771]
+script = ExtResource("3_trapmgr")
 
 [node name="World" type="Node3D" parent="." unique_id=590027524]
 process_mode = 1

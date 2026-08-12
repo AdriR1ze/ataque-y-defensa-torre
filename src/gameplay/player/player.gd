@@ -17,6 +17,7 @@ signal died
 
 var current_weapon := WeaponType.SWORD
 var state: PlayerState = PlayerState.IDLE
+var is_building := false
 
 @onready var health_component: HealthComponent = $HealthComponent
 

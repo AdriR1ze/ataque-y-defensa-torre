@@ -11,7 +11,7 @@ var _current_level : BaseLevel
 @onready var level_1 = "res://src/levels/level_1.tscn"
 func _ready() -> void:
 	_init_player()
-	load_level("res://src/levels/level_1.tscn")
+	load_level(level_1)
 	
 	
 func _init_player() -> void:

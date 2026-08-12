@@ -21,6 +21,8 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if player.state == Player.PlayerState.DEAD:
 		return
+	if player.is_building:
+		return
 	if Input.is_action_just_pressed("attacking"):
 		_handle_attack()
 	if Input.is_action_just_pressed("interact"):

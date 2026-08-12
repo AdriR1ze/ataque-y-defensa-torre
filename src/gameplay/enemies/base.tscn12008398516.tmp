@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://ba178vgakro1i"]
+
+[ext_resource type="Script" uid="uid://udkty61j2by4" path="res://src/gameplay/interactables/base.gd" id="1_vdwip"]
+[ext_resource type="Script" uid="uid://r8flawm71whu" path="res://src/core/components/health_component.gd" id="2_0ikpb"]
+[ext_resource type="Script" uid="uid://4bmyj3rk8ttl" path="res://src/core/components/health_bar_component.gd" id="3_ornm7"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_gy0p7"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_tdeca"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_gy0p7"]
+height = 1.706543
+radius = 0.41308594
+
+[node name="Base" type="StaticBody3D" unique_id=1170133741]
+script = ExtResource("1_vdwip")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1630247467]
+mesh = SubResource("CylinderMesh_gy0p7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=34848412]
+shape = SubResource("CylinderShape3D_tdeca")
+
+[node name="hitbox" type="Area3D" parent="." unique_id=19726076]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="hitbox" unique_id=2037410584]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06713867, 0)
+shape = SubResource("CylinderShape3D_gy0p7")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=519830191]
+script = ExtResource("2_0ikpb")
+
+[node name="HealthBarComponent" type="Node3D" parent="." unique_id=1649495682]
+script = ExtResource("3_ornm7")
+
+[connection signal="area_entered" from="hitbox" to="." method="_on_hitbox_area_entered"]
+[connection signal="body_entered" from="hitbox" to="." method="_on_hitbox_body_entered"]
