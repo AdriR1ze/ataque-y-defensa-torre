@@ -25,6 +25,8 @@ var _target: Node3D
 var _attack_timer := 0.0
 var _knockback_velocity := Vector3.ZERO
 var _flash_tween: Tween
+var _speed_modifiers: Dictionary = {}
+var _vertical_impulse := 0.0
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var hitbox_component: HitboxComponent = $HitboxComponent
@@ -32,6 +34,7 @@ var _flash_tween: Tween
 
 var _damage_material := StandardMaterial3D.new()
 
+@onready var player_cerca = false
 
 func _ready() -> void:
 	add_to_group("enemies")
@@ -50,10 +53,14 @@ func _physics_process(delta: float) -> void:
 	_attack_timer = maxf(_attack_timer - delta, 0.0)
 	_knockback_velocity = _knockback_velocity.move_toward(Vector3.ZERO, knockback_decay * delta)
 
-	if _knockback_velocity.length() > 0.01:
+	if _knockback_velocity.length() > 0.01 or _vertical_impulse > 0.0:
 		velocity.x = _knockback_velocity.x
 		velocity.z = _knockback_velocity.z
 		_apply_gravity(delta)
+		velocity.y += _knockback_velocity.y
+		if _vertical_impulse > 0.0:
+			velocity.y = _vertical_impulse
+			_vertical_impulse = 0.0
 		move_and_slide()
 		return
 
@@ -89,12 +96,18 @@ func _physics_process(delta: float) -> void:
 
 
 func _find_target() -> void:
-	var base := get_tree().get_first_node_in_group("base") as Node3D
-	if base != null:
-		_target = base
-		return
-	_target = get_tree().get_first_node_in_group("player") as Node3D
-
+	print(player_cerca)
+	if player_cerca == false:
+		var base := get_tree().get_first_node_in_group("base") as Node3D
+		if base != null:
+			_target = base
+			return
+	else:
+		_target = get_tree().get_first_node_in_group("player") as Node3D
+		
+	if _target == null:
+		push_error("Couldnt find the target, the base is not in the tree or the player is not in range and couldnt loaded")
+	return
 
 func _chase() -> void:
 	if _target == null:
@@ -106,8 +119,8 @@ func _chase() -> void:
 		return
 
 	to_target = to_target.normalized()
-	velocity.x = to_target.x * move_speed
-	velocity.z = to_target.z * move_speed
+	velocity.x = to_target.x * get_effective_speed()
+	velocity.z = to_target.z * get_effective_speed()
 	_face_direction(to_target)
 
 
@@ -148,6 +161,37 @@ func take_trap_damage(amount: float) -> void:
 	health_component.take_damage(amount)
 
 
+func apply_speed_modifier(modifier_id: String, factor: float) -> void:
+	_speed_modifiers[modifier_id] = factor
+
+
+func remove_speed_modifier(modifier_id: String) -> void:
+	_speed_modifiers.erase(modifier_id)
+
+
+func get_effective_speed() -> float:
+	var multiplier := 1.0
+	for factor in _speed_modifiers.values():
+		multiplier *= factor
+	return move_speed * maxf(multiplier, 0.0)
+
+
+func launch_up(force: float) -> void:
+	_vertical_impulse = force
+
+
+func push(direction: Vector3, force: float) -> void:
+	_knockback_velocity = direction.normalized() * force
+
+
+func knock_back(direction: Vector3, force: float) -> void:
+	var dir := direction
+	dir.y = 0.0
+	if dir.length() < 0.01:
+		return
+	_knockback_velocity = dir.normalized() * force
+
+
 func _apply_knockback() -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if player == null:
@@ -184,3 +228,13 @@ func _on_died() -> void:
 	set_state(EnemyState.DEAD)
 	hitbox_component.deactivate()
 	queue_free()
+
+
+func _on_vision_component_body_entered(body: Node3D) -> void:
+	if body.is_in_group("player"):
+		player_cerca = true
+
+
+func _on_vision_component_body_exited(body: Node3D) -> void:
+	if body.is_in_group("player"):
+		player_cerca = false

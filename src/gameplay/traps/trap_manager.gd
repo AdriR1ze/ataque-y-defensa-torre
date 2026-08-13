@@ -4,6 +4,16 @@ class_name TrapManager
 const TRAP_SCENES := {
 	1: preload("res://src/gameplay/traps/spikes_trap.tscn"),
 	2: preload("res://src/gameplay/traps/spike_launcher_trap.tscn"),
+	3: preload("res://src/gameplay/traps/laser_trap.tscn"),
+	4: preload("res://src/gameplay/traps/mud_trap.tscn"),
+	5: preload("res://src/gameplay/traps/spring_trap.tscn"),
+	6: preload("res://src/gameplay/traps/swing_ball_trap.tscn"),
+	7: preload("res://src/gameplay/traps/spinning_saw_trap.tscn"),
+	8: preload("res://src/gameplay/traps/web_trap.tscn"),
+	9: preload("res://src/gameplay/traps/explosive_mine_trap.tscn"),
+	10: preload("res://src/gameplay/traps/wind_gust_trap.tscn"),
+	11: preload("res://src/gameplay/traps/suction_trap.tscn"),
+	12: preload("res://src/gameplay/traps/guillotine_trap.tscn"),
 }
 
 const GROUP_COLOCABLE := "colocable"
@@ -194,6 +204,8 @@ func _is_colocable(node: Node) -> bool:
 	var current: Node = node
 	while current != null:
 		if current.is_in_group(GROUP_COLOCABLE):
+			return true
+		if current is GridMap:
 			return true
 		current = current.get_parent()
 	return false

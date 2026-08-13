@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/traps/swing_ball_trap.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/core/components/damage_area_component.gd" id="2_damage_area"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_arm"]
+size = Vector3(0.12, 1, 0.12)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ball"]
+radius = 0.45
+height = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_arm"]
+albedo_color = Color(0.4, 0.36, 0.34, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ball"]
+albedo_color = Color(0.5, 0.52, 0.6, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
+radius = 0.65
+
+[node name="SwingBallTrap" type="Node3D"]
+script = ExtResource("1_script")
+display_name = "Bola demoledora"
+surface_orientation = 3
+
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="Arm" type="MeshInstance3D" parent="Pivot"]
+mesh = SubResource("BoxMesh_arm")
+surface_material_override/0 = SubResource("Mat_arm")
+
+[node name="Ball" type="MeshInstance3D" parent="Pivot"]
+mesh = SubResource("SphereMesh_ball")
+surface_material_override/0 = SubResource("Mat_ball")
+
+[node name="DamageArea" type="Area3D" parent="Pivot"]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("2_damage_area")
+damage_per_second = 15.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pivot/DamageArea"]
+shape = SubResource("SphereShape3D_ball")

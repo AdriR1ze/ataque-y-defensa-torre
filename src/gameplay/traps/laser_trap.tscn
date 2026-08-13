@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/traps/laser_trap.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/core/components/damage_area_component.gd" id="2_damage_area"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_emitter"]
+top_radius = 0.16
+bottom_radius = 0.2
+height = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_beam"]
+size = Vector3(0.12, 1, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_glow"]
+size = Vector3(0.3, 1, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="Mat_emitter"]
+albedo_color = Color(0.2, 0.2, 0.25, 1)
+emission_enabled = true
+emission = Color(0.2, 0.2, 0.25, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_beam"]
+albedo_color = Color(1, 0.1, 0.05, 0.8)
+emission_enabled = true
+emission = Color(1, 0.1, 0.05, 1)
+emission_energy_multiplier = 3.0
+transparency = 1
+
+[sub_resource type="StandardMaterial3D" id="Mat_glow"]
+albedo_color = Color(1, 0.2, 0.1, 0.25)
+emission_enabled = true
+emission = Color(1, 0.1, 0.05, 1)
+transparency = 1
+shading_mode = 0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_beam"]
+size = Vector3(0.9, 1, 0.9)
+
+[node name="LaserTrap" type="Node3D"]
+script = ExtResource("1_script")
+display_name = "Láser de techo"
+surface_orientation = 3
+
+[node name="Emitter" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_emitter")
+surface_material_override/0 = SubResource("Mat_emitter")
+
+[node name="Beam" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_beam")
+surface_material_override/0 = SubResource("Mat_beam")
+
+[node name="BeamGlow" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_glow")
+surface_material_override/0 = SubResource("Mat_glow")
+
+[node name="DamageArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("2_damage_area")
+damage_per_second = 40.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea"]
+shape = SubResource("BoxShape3D_beam")

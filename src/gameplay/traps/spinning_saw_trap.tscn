@@ -1,0 +1,68 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/traps/spinning_saw_trap.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/core/components/damage_area_component.gd" id="2_damage_area"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_base"]
+top_radius = 0.78
+bottom_radius = 0.78
+height = 0.08
+
+[sub_resource type="BoxMesh" id="BoxMesh_blade1"]
+size = Vector3(1.4, 0.05, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_blade2"]
+size = Vector3(0.2, 0.05, 1.4)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hub"]
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_base"]
+albedo_color = Color(0.35, 0.36, 0.4, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_saw"]
+albedo_color = Color(0.75, 0.78, 0.82, 1)
+metallic = 0.9
+roughness = 0.25
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_saw"]
+radius = 0.75
+height = 0.4
+
+[node name="SpinningSawTrap" type="Node3D"]
+script = ExtResource("1_script")
+display_name = "Sierra giratoria"
+snap_rotation_degrees = 45.0
+surface_orientation = 1
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+mesh = SubResource("CylinderMesh_base")
+surface_material_override/0 = SubResource("Mat_base")
+
+[node name="Saw" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+
+[node name="Blade1" type="MeshInstance3D" parent="Saw"]
+mesh = SubResource("BoxMesh_blade1")
+surface_material_override/0 = SubResource("Mat_saw")
+
+[node name="Blade2" type="MeshInstance3D" parent="Saw"]
+mesh = SubResource("BoxMesh_blade2")
+surface_material_override/0 = SubResource("Mat_saw")
+
+[node name="Hub" type="MeshInstance3D" parent="Saw"]
+mesh = SubResource("CylinderMesh_hub")
+surface_material_override/0 = SubResource("Mat_saw")
+
+[node name="DamageArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("2_damage_area")
+damage_per_second = 18.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("CylinderShape3D_saw")

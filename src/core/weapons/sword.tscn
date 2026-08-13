@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://deg5hgh7rcxij"]
 
-[ext_resource type="Script" path="res://src/core/weapons/sword.gd" id="1_sword_script"]
+[ext_resource type="Script" uid="uid://bqxb6no6aa0jb" path="res://src/core/weapons/sword.gd" id="1_sword_script"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_blade"]
 size = Vector3(0.12, 0.7, 0.04)
@@ -12,40 +12,41 @@ size = Vector3(0.06, 0.25, 0.06)
 size = Vector3(0.2, 0.06, 0.06)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
-size = Vector3(0.25, 0.9, 1.0)
-
-[sub_resource type="BoxMesh" id="BoxMesh_debug_hitbox"]
-size = Vector3(0.25, 0.9, 1.0)
+size = Vector3(0.25, 0.9, 3.4475098)
 
 [sub_resource type="StandardMaterial3D" id="DebugMaterial"]
 transparency = 1
-albedo_color = Color(1, 0, 0, 0.15)
 shading_mode = 0
+albedo_color = Color(1, 0, 0, 0.15)
 
-[node name="Sword" type="Node3D"]
+[sub_resource type="BoxMesh" id="BoxMesh_debug_hitbox"]
+size = Vector3(0.25, 0.9, 3.4545898)
+
+[node name="Sword" type="Node3D" unique_id=375903021]
 script = ExtResource("1_sword_script")
 
-[node name="Blade" type="MeshInstance3D" parent="."]
+[node name="Blade" type="MeshInstance3D" parent="." unique_id=410653989]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -0.45)
 mesh = SubResource("BoxMesh_blade")
 
-[node name="Handle" type="MeshInstance3D" parent="."]
+[node name="Handle" type="MeshInstance3D" parent="." unique_id=1843860151]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0.05)
 mesh = SubResource("BoxMesh_handle")
 
-[node name="Guard" type="MeshInstance3D" parent="."]
+[node name="Guard" type="MeshInstance3D" parent="." unique_id=1806044261]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0.05)
 mesh = SubResource("BoxMesh_guard")
 
-[node name="Area3D" type="Area3D" parent="."]
+[node name="Area3D" type="Area3D" parent="." unique_id=788938347]
+visible = false
 collision_layer = 0
 collision_mask = 5
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.45)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=2140023689]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -1.6737549)
 shape = SubResource("BoxShape3D_hurtbox")
 
-[node name="DebugHitbox" type="MeshInstance3D" parent="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.45)
-mesh = SubResource("BoxMesh_debug_hitbox")
+[node name="DebugHitbox" type="MeshInstance3D" parent="Area3D" unique_id=1664636165]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -1.677295)
 material_override = SubResource("DebugMaterial")
+mesh = SubResource("BoxMesh_debug_hitbox")

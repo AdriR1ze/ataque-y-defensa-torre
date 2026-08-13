@@ -12,7 +12,7 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_playercol"]
 radius = 0.55
 
-[node name="Player" type="CharacterBody3D" unique_id=1697414130]
+[node name="Player" type="CharacterBody3D" unique_id=1697414130 groups=["player"]]
 collision_layer = 2
 script = ExtResource("1_script")
 

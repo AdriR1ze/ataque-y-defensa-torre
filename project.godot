@@ -29,6 +29,10 @@ folder_colors={
 "res://src/debug/": "yellow"
 }
 
+[global_group]
+
+player=""
+
 [input]
 
 move_forward={

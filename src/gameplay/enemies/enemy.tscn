@@ -14,7 +14,10 @@ albedo_color = Color(1, 0.43529412, 1, 1)
 material = SubResource("StandardMaterial3D_tdeca")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_attack"]
-size = Vector3(1.4, 1.6, 1.4)
+size = Vector3(1.289209, 2.0070312, 1.347461)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_u177a"]
+size = Vector3(4.679473, 1, 5.4986095)
 
 [node name="Enemy" type="CharacterBody3D" unique_id=747958128]
 collision_layer = 4
@@ -37,8 +40,19 @@ collision_mask = 10
 script = ExtResource("3_hitbox")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HitboxComponent" unique_id=610558294]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.023852587, 0.0063874424, -0.009227991)
 shape = SubResource("BoxShape3D_attack")
 
 [node name="HealthBar" type="Node3D" parent="." unique_id=291634080]
 script = ExtResource("4_healthbar")
+
+[node name="VisionComponent" type="Area3D" parent="." unique_id=490262066]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VisionComponent" unique_id=505184680]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19072771, 0, 2.8967266)
+shape = SubResource("BoxShape3D_u177a")
+
+[connection signal="body_entered" from="VisionComponent" to="." method="_on_vision_component_body_entered"]
+[connection signal="body_exited" from="VisionComponent" to="." method="_on_vision_component_body_exited"]

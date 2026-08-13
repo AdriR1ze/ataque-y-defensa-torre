@@ -13,7 +13,7 @@ height = 2.5145264
 radius = 0.5678711
 
 [node name="Base" type="StaticBody3D" unique_id=1170133741]
-collision_layer = 8
+collision_layer = 10
 collision_mask = 7
 script = ExtResource("1_vdwip")
 

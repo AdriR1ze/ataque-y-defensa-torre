@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/traps/ghost_ball_projectile.gd" id="1_script"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_ball"]
+radius = 0.2
+height = 0.4
+
+[sub_resource type="SphereMesh" id="SphereMesh_core"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_ghost"]
+albedo_color = Color(0.6, 0.85, 1.0, 0.6)
+emission_enabled = true
+emission = Color(0.4, 0.85, 1.0, 1)
+emission_energy_multiplier = 2.0
+transparency = 1
+
+[sub_resource type="StandardMaterial3D" id="Mat_core"]
+albedo_color = Color(1.0, 1.0, 1.0, 0.95)
+emission_enabled = true
+emission = Color(0.8, 0.95, 1.0, 1)
+emission_energy_multiplier = 1.5
+transparency = 1
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
+radius = 0.22
+
+[node name="GhostBallProjectile" type="CharacterBody3D"]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_script")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_ball")
+surface_material_override/0 = SubResource("Mat_ghost")
+
+[node name="Core" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_core")
+surface_material_override/0 = SubResource("Mat_core")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_ball")
