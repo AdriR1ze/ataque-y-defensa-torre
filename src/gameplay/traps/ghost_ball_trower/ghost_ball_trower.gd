@@ -1,7 +1,7 @@
 extends StaticBody3D
 class_name GhostBallTrower
 
-const PROJECTILE_SCENE := preload("res://src/gameplay/traps/ghost_ball_projectile.tscn")
+const PROJECTILE_SCENE := preload("res://src/gameplay/traps/bullets/ghost_ball_projectile.tscn")
 
 @export var projectile_speed := 18.0
 @export var projectile_damage := 12.0

@@ -10,7 +10,6 @@ enum EnemyState {
 
 @export var move_speed := 3.0
 @export var gravity := 20.0
-@export var chase_range := 20.0
 @export var attack_range := 2.0
 @export var attack_damage := 10.0
 @export var attack_cooldown := 1.2
@@ -18,6 +17,8 @@ enum EnemyState {
 @export var knockback_force := 6.0
 @export var knockback_decay := 12.0
 @export var damage_flash_time := 0.12
+@export var repath_interval := 0.5
+@export var waypoint_distance := 0.6
 
 var state: EnemyState = EnemyState.IDLE
 
@@ -27,6 +28,10 @@ var _knockback_velocity := Vector3.ZERO
 var _flash_tween: Tween
 var _speed_modifiers: Dictionary = {}
 var _vertical_impulse := 0.0
+var _navigation: NavigationGrid
+var _current_path := PackedVector3Array()
+var _path_index := 0
+var _repath_timer := 0.0
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var hitbox_component: HitboxComponent = $HitboxComponent
@@ -51,6 +56,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_attack_timer = maxf(_attack_timer - delta, 0.0)
+	_repath_timer = maxf(_repath_timer - delta, 0.0)
 	_knockback_velocity = _knockback_velocity.move_toward(Vector3.ZERO, knockback_decay * delta)
 
 	if _knockback_velocity.length() > 0.01 or _vertical_impulse > 0.0:
@@ -76,13 +82,6 @@ func _physics_process(delta: float) -> void:
 
 	var distance := global_position.distance_to(_target.global_position)
 
-	if distance > chase_range:
-		velocity.x = 0.0
-		velocity.z = 0.0
-		set_state(EnemyState.IDLE)
-		move_and_slide()
-		return
-
 	if distance <= attack_range:
 		velocity.x = 0.0
 		velocity.z = 0.0
@@ -96,7 +95,6 @@ func _physics_process(delta: float) -> void:
 
 
 func _find_target() -> void:
-	print(player_cerca)
 	if player_cerca == false:
 		var base := get_tree().get_first_node_in_group("base") as Node3D
 		if base != null:
@@ -113,15 +111,51 @@ func _chase() -> void:
 	if _target == null:
 		return
 
+	_update_path()
+	var direction := _get_path_direction()
+	velocity.x = direction.x * get_effective_speed()
+	velocity.z = direction.z * get_effective_speed()
+	if direction.length() > 0.01:
+		_face_direction(direction)
+
+
+func _update_path() -> void:
+	if _navigation == null:
+		_navigation = get_tree().get_first_node_in_group("navigation") as NavigationGrid
+	if _navigation == null:
+		_current_path = PackedVector3Array()
+		return
+	if _repath_timer > 0.0 and not _current_path.is_empty():
+		return
+	_repath_timer = repath_interval
+	_current_path = _navigation.find_path(global_position, _target.global_position)
+	_path_index = 0
+
+
+func _get_path_direction() -> Vector3:
+	if _current_path.is_empty():
+		return _direction_to_target()
+
+	while _path_index < _current_path.size():
+		var waypoint := _current_path[_path_index]
+		var to_waypoint := waypoint - global_position
+		to_waypoint.y = 0.0
+		if to_waypoint.length() <= waypoint_distance:
+			_path_index += 1
+			continue
+		return to_waypoint.normalized()
+
+	return _direction_to_target()
+
+
+func _direction_to_target() -> Vector3:
+	if _target == null:
+		return Vector3.ZERO
 	var to_target := _target.global_position - global_position
 	to_target.y = 0.0
 	if to_target.length() < 0.01:
-		return
-
-	to_target = to_target.normalized()
-	velocity.x = to_target.x * get_effective_speed()
-	velocity.z = to_target.z * get_effective_speed()
-	_face_direction(to_target)
+		return Vector3.ZERO
+	return to_target.normalized()
 
 
 func _face_direction(direction: Vector3) -> void:

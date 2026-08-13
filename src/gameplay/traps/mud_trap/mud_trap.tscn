@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://cpfi3ih3dlywu"]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/traps/mud_trap.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/gameplay/traps/mud_trap/mud_trap.gd" id="1_script"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_pool"]
 top_radius = 1.4
@@ -8,40 +8,41 @@ bottom_radius = 1.4
 height = 0.1
 
 [sub_resource type="StandardMaterial3D" id="Mat_mud"]
-transparency = 1
 albedo_color = Color(0.35, 0.24, 0.12, 0.85)
 emission_enabled = true
 emission = Color(0.2, 0.12, 0.05, 1)
 emission_energy_multiplier = 0.4
+transparency = 1
 
 [sub_resource type="StandardMaterial3D" id="Mat_mud_top"]
+albedo_color = Color(0.5, 0.36, 0.18, 0.5)
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0.5, 0.36, 0.18, 0.5)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_mud"]
-height = 0.4
 radius = 1.35
+height = 0.4
 
-[node name="MudTrap" type="Node3D" unique_id=126111423]
+[node name="MudTrap" type="Node3D"]
 script = ExtResource("1_script")
 display_name = "Lodo"
+snap_rotation_degrees = 90.0
 surface_orientation = 1
 
-[node name="Pool" type="MeshInstance3D" parent="." unique_id=432333457]
+[node name="Pool" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
 mesh = SubResource("CylinderMesh_pool")
 surface_material_override/0 = SubResource("Mat_mud")
 
-[node name="Surface" type="MeshInstance3D" parent="." unique_id=1464224934]
+[node name="Surface" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0)
 mesh = SubResource("CylinderMesh_pool")
 surface_material_override/0 = SubResource("Mat_mud_top")
 
-[node name="MudArea" type="Area3D" parent="." unique_id=1987578019]
+[node name="MudArea" type="Area3D" parent="."]
 collision_layer = 0
 collision_mask = 4
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MudArea" unique_id=1763868411]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MudArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 shape = SubResource("CylinderShape3D_mud")

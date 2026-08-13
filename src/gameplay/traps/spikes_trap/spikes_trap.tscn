@@ -1,18 +1,18 @@
-[gd_scene format=3 uid="uid://cm7wibbv45gnp"]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/traps/spikes_trap.gd" id="1_script"]
-[ext_resource type="Script" uid="uid://bquqjvc67guku" path="res://src/core/components/damage_area_component.gd" id="2_damage_area"]
+[ext_resource type="Script" path="res://src/gameplay/traps/spikes_trap/spikes_trap.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/core/components/damage_area_component.gd" id="2_damage_area"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_base"]
 size = Vector3(1, 0.15, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_base"]
-albedo_color = Color(0.55, 0.42, 0.3, 1)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_spike"]
 top_radius = 0.0
 bottom_radius = 0.12
 height = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_base"]
+albedo_color = Color(0.55, 0.42, 0.3, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spike"]
 albedo_color = Color(0.9, 0.9, 0.95, 1)
@@ -20,40 +20,42 @@ albedo_color = Color(0.9, 0.9, 0.95, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_damage"]
 size = Vector3(1.2, 0.55, 1.2)
 
-[node name="SpikesTrap" type="Node3D" unique_id=514051699]
+[node name="SpikesTrap" type="Node3D"]
 script = ExtResource("1_script")
 display_name = "Pinchos"
+snap_rotation_degrees = 90.0
+surface_orientation = 0
 
-[node name="Base" type="MeshInstance3D" parent="." unique_id=1072843504]
+[node name="Base" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
 mesh = SubResource("BoxMesh_base")
 surface_material_override/0 = SubResource("StandardMaterial3D_base")
 
-[node name="Spike1" type="MeshInstance3D" parent="." unique_id=1683052823]
+[node name="Spike1" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 0.35, -0.35)
 mesh = SubResource("CylinderMesh_spike")
 surface_material_override/0 = SubResource("StandardMaterial3D_spike")
 
-[node name="Spike2" type="MeshInstance3D" parent="." unique_id=535482413]
+[node name="Spike2" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.35, -0.35)
 mesh = SubResource("CylinderMesh_spike")
 surface_material_override/0 = SubResource("StandardMaterial3D_spike")
 
-[node name="Spike3" type="MeshInstance3D" parent="." unique_id=518160580]
+[node name="Spike3" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 0.35, 0.35)
 mesh = SubResource("CylinderMesh_spike")
 surface_material_override/0 = SubResource("StandardMaterial3D_spike")
 
-[node name="Spike4" type="MeshInstance3D" parent="." unique_id=854339349]
+[node name="Spike4" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.35, 0.35)
 mesh = SubResource("CylinderMesh_spike")
 surface_material_override/0 = SubResource("StandardMaterial3D_spike")
 
-[node name="DamageArea" type="Area3D" parent="." unique_id=986496285]
+[node name="DamageArea" type="Area3D" parent="."]
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("2_damage_area")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea" unique_id=25518449]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 shape = SubResource("BoxShape3D_damage")

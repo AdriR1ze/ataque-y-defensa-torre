@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://cgebrddvn6fvq"]
+[gd_scene format=3 uid="uid://cqwpesb004fgo"]
 
-[ext_resource type="Script" path="res://src/gameplay/traps/ghost_ball_trower.gd" id="1_2ynfe"]
+[ext_resource type="Script" uid="uid://d3gpr2bhtdx7o" path="res://src/gameplay/traps/ghost_ball_trower/ghost_ball_trower.gd" id="1_2ynfe"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_vgtt4"]
 height = 0.21070862

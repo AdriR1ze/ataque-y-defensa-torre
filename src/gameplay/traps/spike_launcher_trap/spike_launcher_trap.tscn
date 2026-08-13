@@ -1,44 +1,46 @@
-[gd_scene format=3 uid="uid://dli6h1cp02qf1"]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/traps/spike_launcher_trap.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/gameplay/traps/spike_launcher_trap/spike_launcher_trap.gd" id="1_script"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_base"]
 size = Vector3(0.9, 0.2, 0.9)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_base"]
-albedo_color = Color(0.45, 0.45, 0.5, 1)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_barrel"]
 top_radius = 0.12
 bottom_radius = 0.15
 height = 0.8
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_barrel"]
-albedo_color = Color(0.35, 0.36, 0.42, 1)
-
 [sub_resource type="CylinderMesh" id="CylinderMesh_tip"]
 top_radius = 0.0
 bottom_radius = 0.12
 height = 0.3
 
-[node name="SpikeLauncherTrap" type="Node3D" unique_id=1072678968]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_base"]
+albedo_color = Color(0.45, 0.45, 0.5, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_barrel"]
+albedo_color = Color(0.35, 0.36, 0.42, 1)
+
+[node name="SpikeLauncherTrap" type="Node3D"]
 script = ExtResource("1_script")
 display_name = "Lanzador de pinchos"
+snap_rotation_degrees = 90.0
+surface_orientation = 0
 
-[node name="Base" type="MeshInstance3D" parent="." unique_id=1426468604]
+[node name="Base" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 mesh = SubResource("BoxMesh_base")
 surface_material_override/0 = SubResource("StandardMaterial3D_base")
 
-[node name="Barrel" type="MeshInstance3D" parent="." unique_id=265408219]
+[node name="Barrel" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 mesh = SubResource("CylinderMesh_barrel")
 surface_material_override/0 = SubResource("StandardMaterial3D_barrel")
 
-[node name="Tip" type="MeshInstance3D" parent="." unique_id=135585122]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="Tip" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
 mesh = SubResource("CylinderMesh_tip")
 surface_material_override/0 = SubResource("StandardMaterial3D_barrel")
 
-[node name="Muzzle" type="Marker3D" parent="." unique_id=1547591]
+[node name="Muzzle" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)

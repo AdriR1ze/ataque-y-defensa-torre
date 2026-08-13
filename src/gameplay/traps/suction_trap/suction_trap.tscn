@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/traps/suction_trap.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/gameplay/traps/suction_trap/suction_trap.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/core/components/damage_area_component.gd" id="2_damage_area"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_fan"]

@@ -1,7 +1,7 @@
 extends Trap
 class_name SpikeLauncherTrap
 
-const PROJECTILE_SCENE := preload("res://src/gameplay/traps/spike_projectile.tscn")
+const PROJECTILE_SCENE := preload("res://src/gameplay/traps/bullets/spike_projectile.tscn")
 
 @export var fire_interval := 1.5
 @export var range := 20.0
