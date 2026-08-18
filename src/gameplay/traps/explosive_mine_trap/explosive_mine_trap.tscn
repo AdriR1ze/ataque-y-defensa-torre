@@ -1,19 +1,20 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b8s6g14dt60o1"]
 
-[ext_resource type="Script" path="res://src/gameplay/traps/explosive_mine_trap/explosive_mine_trap.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://co58utgeygby2" path="res://src/gameplay/traps/explosive_mine_trap/explosive_mine_trap.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://r8flawm71whu" path="res://src/core/components/health_component.gd" id="2_v2n1d"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_mine"]
 radius = 0.35
 height = 0.7
 
+[sub_resource type="StandardMaterial3D" id="Mat_mine"]
+albedo_color = Color(0.15, 0.18, 0.2, 1)
+roughness = 0.6
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_spike"]
 top_radius = 0.0
 bottom_radius = 0.06
 height = 0.25
-
-[sub_resource type="StandardMaterial3D" id="Mat_mine"]
-albedo_color = Color(0.15, 0.18, 0.2, 1)
-roughness = 0.6
 
 [sub_resource type="StandardMaterial3D" id="Mat_spike"]
 albedo_color = Color(0.7, 0.72, 0.75, 1)
@@ -24,41 +25,44 @@ radius = 0.6
 [sub_resource type="SphereShape3D" id="SphereShape3D_explosion"]
 radius = 2.5
 
-[node name="ExplosiveMineTrap" type="Node3D"]
+[node name="ExplosiveMineTrap" type="Node3D" unique_id=1520926624]
 script = ExtResource("1_script")
 display_name = "Mina explosiva"
-snap_rotation_degrees = 90.0
 surface_orientation = 1
 
-[node name="MineMesh" type="Node3D" parent="."]
+[node name="MineMesh" type="Node3D" parent="." unique_id=2125090685]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 
-[node name="Sphere" type="MeshInstance3D" parent="MineMesh"]
+[node name="Sphere" type="MeshInstance3D" parent="MineMesh" unique_id=1159944131]
 mesh = SubResource("SphereMesh_mine")
 surface_material_override/0 = SubResource("Mat_mine")
 
-[node name="Spike1" type="MeshInstance3D" parent="MineMesh"]
+[node name="Spike1" type="MeshInstance3D" parent="MineMesh" unique_id=619386266]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.3, 0.15)
 mesh = SubResource("CylinderMesh_spike")
 surface_material_override/0 = SubResource("Mat_spike")
 
-[node name="Spike2" type="MeshInstance3D" parent="MineMesh"]
+[node name="Spike2" type="MeshInstance3D" parent="MineMesh" unique_id=1066245944]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.3, -0.15)
 mesh = SubResource("CylinderMesh_spike")
 surface_material_override/0 = SubResource("Mat_spike")
 
-[node name="TriggerArea" type="Area3D" parent="."]
+[node name="TriggerArea" type="Area3D" parent="." unique_id=2005087006]
 collision_layer = 0
 collision_mask = 4
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TriggerArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TriggerArea" unique_id=1291868057]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 shape = SubResource("SphereShape3D_trigger")
 
-[node name="ExplosionArea" type="Area3D" parent="."]
+[node name="ExplosionArea" type="Area3D" parent="." unique_id=1596105918]
 collision_layer = 0
 collision_mask = 4
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ExplosionArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ExplosionArea" unique_id=927455834]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("SphereShape3D_explosion")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1250058812]
+script = ExtResource("2_v2n1d")
+metadata/_custom_type_script = "uid://r8flawm71whu"

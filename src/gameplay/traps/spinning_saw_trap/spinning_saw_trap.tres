@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TrapData" format=3 uid="uid://dib3s6ggjxe71"]
+
+[ext_resource type="Script" uid="uid://6mllp02vdl7t" path="res://src/gameplay/traps/TrapData.gd" id="1_oswa0"]
+[ext_resource type="PackedScene" path="res://src/gameplay/traps/spinning_saw_trap/spinning_saw_trap.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_oswa0")
+id = 7
+trap_name = "Sierra giratoria"
+description = "Una sierra que gira y corta a los enemigos cercanos."
+cost = 125
+damage = 18.0
+range = 0.5
+scene = ExtResource("2_scene")
+metadata/_custom_type_script = "uid://6mllp02vdl7t"

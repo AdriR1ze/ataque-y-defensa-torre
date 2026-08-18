@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/traps/mud_trap/mud_trap.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bp0qbdvftwekg" path="res://src/gameplay/traps/mud_trap/mud_trap.gd" id="1_script"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_pool"]
 top_radius = 1.4

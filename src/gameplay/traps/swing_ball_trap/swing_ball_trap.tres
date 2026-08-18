@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TrapData" format=3 uid="uid://b6sj6mhjcvlrj"]
+
+[ext_resource type="Script" uid="uid://6mllp02vdl7t" path="res://src/gameplay/traps/TrapData.gd" id="1_ebtf3"]
+[ext_resource type="PackedScene" path="res://src/gameplay/traps/swing_ball_trap/swing_ball_trap.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_ebtf3")
+id = 6
+trap_name = "Bola demoledora"
+description = "Una bola giratoria que aplasta y empuja a los enemigos."
+cost = 175
+damage = 15.0
+range = 3.0
+scene = ExtResource("2_scene")
+metadata/_custom_type_script = "uid://6mllp02vdl7t"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrapData" format=3 uid="uid://bbk11buumi4rj"]
+
+[ext_resource type="Script" uid="uid://6mllp02vdl7t" path="res://src/gameplay/traps/TrapData.gd" id="1_ikr3s"]
+[ext_resource type="PackedScene" uid="uid://b8s6g14dt60o1" path="res://src/gameplay/traps/explosive_mine_trap/explosive_mine_trap.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_ikr3s")
+id = 9
+trap_name = "Mina explosiva"
+description = "Explota al detectar enemigos causando gran daño en área."
+cost = 250
+damage = 60.0
+cooldown = 6.0
+range = 2.5
+scene = ExtResource("2_scene")
+metadata/_custom_type_script = "uid://6mllp02vdl7t"

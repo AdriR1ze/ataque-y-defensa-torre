@@ -26,7 +26,6 @@ size = Vector3(3, 6, 3)
 
 [node name="WindGustTrap" type="Node3D" unique_id=122635739]
 script = ExtResource("1_script")
-display_name = "Ventilador"
 
 [node name="Base" type="MeshInstance3D" parent="." unique_id=433791830]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)

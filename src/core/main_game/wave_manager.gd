@@ -12,15 +12,17 @@ class_name WaveManager
 
 
 func _ready() -> void:
-	call_deferred("spawn_enemies")
+	call_deferred("spawn_enemies", level_spawner)
+	await get_tree().create_timer(4.0).timeout
+	call_deferred("spawn_enemies", level_spawner)
 
 
-func spawn_enemies() -> void:
+func spawn_enemies(spawner) -> void:
 	for i in range(wave_amount_enemies):
-		_spawn_enemy(enemies.pick_random())
+		_spawn_enemy(enemies.pick_random(), spawner)
 
 
-func _spawn_enemy(enemy_scene: PackedScene) -> void:
+func _spawn_enemy(enemy_scene: PackedScene, spawner) -> void:
 	var enemy := enemy_scene.instantiate() as Enemy
 
 	level_root.add_child(enemy)
@@ -35,4 +37,5 @@ func _spawn_enemy(enemy_scene: PackedScene) -> void:
 	if navigation != null:
 		spawn_position = navigation.snap_to_walkable_world(spawn_position)
 
+	spawn_position.y = 1.0
 	enemy.global_position = spawn_position

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TrapData" format=3 uid="uid://kd7kaoenih88"]
+
+[ext_resource type="Script" uid="uid://6mllp02vdl7t" path="res://src/gameplay/traps/TrapData.gd" id="1_tj760"]
+[ext_resource type="PackedScene" path="res://src/gameplay/traps/web_trap/web_trap.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_tj760")
+id = 8
+trap_name = "Telaraña"
+description = "Inmoviliza temporalmente a los enemigos."
+cost = 75
+range = 1.0
+scene = ExtResource("2_scene")
+metadata/_custom_type_script = "uid://6mllp02vdl7t"
