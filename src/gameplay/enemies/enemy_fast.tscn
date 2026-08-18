@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://c7f4st3n3my01"]
+
+[ext_resource type="PackedScene" uid="uid://idwmj887361c" path="res://src/gameplay/enemies/enemy.tscn" id="1_base"]
+
+[node name="EnemyFast" instance=ExtResource("1_base")]
+move_speed = 5.5
+attack_damage = 8.0
+body_color = Color(1, 0.5, 0.15, 1)
+body_scale = 0.7
+max_health = 30.0

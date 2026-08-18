@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://c7t4nk3n3my02"]
+
+[ext_resource type="PackedScene" uid="uid://idwmj887361c" path="res://src/gameplay/enemies/enemy.tscn" id="1_base"]
+
+[node name="EnemyTank" instance=ExtResource("1_base")]
+move_speed = 1.8
+attack_damage = 20.0
+body_color = Color(0.2, 0.8, 0.4, 1)
+body_scale = 1.5
+max_health = 150.0

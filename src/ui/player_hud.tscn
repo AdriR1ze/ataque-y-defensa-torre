@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://d0weclp3n6o4d"]
+
+[ext_resource type="Script" uid="uid://pl4y3rhudscr1" path="res://src/ui/player_hud.gd" id="1_hud"]
+
+[node name="PlayerHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="HealthBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -64.0
+offset_right = 260.0
+offset_bottom = -12.0
+grow_vertical = 0
+
+[node name="HealthLabel" type="Label" parent="HealthBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "HP 100 / 100"
+
+[node name="HealthBar" type="ProgressBar" parent="HealthBox"]
+unique_name_in_owner = true
+layout_mode = 2
+value = 100.0
+show_percentage = false

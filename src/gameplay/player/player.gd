@@ -31,6 +31,8 @@ func set_state(new_state: PlayerState) -> void:
 	state = new_state
 
 func take_damage(amount: float) -> void:
+	if Debug.debug_enabled:
+		return
 	health_component.take_damage(amount)
 
 func heal(amount: float) -> void:

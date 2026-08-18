@@ -19,6 +19,9 @@ enum EnemyState {
 @export var damage_flash_time := 0.12
 @export var repath_interval := 0.5
 @export var waypoint_distance := 0.6
+@export var body_color := Color(1.0, 0.44, 1.0)
+@export var body_scale := 1.0
+@export var max_health := 50.0
 
 var state: EnemyState = EnemyState.IDLE
 
@@ -33,9 +36,14 @@ var _current_path := PackedVector3Array()
 var _path_index := 0
 var _repath_timer := 0.0
 
+var _route: EnemyRoute
+var _route_points := PackedVector3Array()
+var _route_index := 0
+
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var hitbox_component: HitboxComponent = $HitboxComponent
 @onready var mesh: MeshInstance3D = $MeshInstance3D
+@onready var collision_shape: CollisionShape3D = $CollisionShape3D
 
 var _damage_material := StandardMaterial3D.new()
 
@@ -49,6 +57,22 @@ func _ready() -> void:
 	_damage_material.albedo_color = Color(1.0, 0.1, 0.1)
 	_damage_material.emission = Color(1.0, 0.1, 0.1)
 	_damage_material.emission_energy_multiplier = 1.5
+
+	_apply_appearance()
+
+
+func _apply_appearance() -> void:
+	health_component.max_health = max_health
+	health_component.current_health = max_health
+
+	var material := StandardMaterial3D.new()
+	material.albedo_color = body_color
+	material.emission = body_color
+	material.emission_energy_multiplier = 0.3
+	mesh.set_surface_override_material(0, material)
+
+	mesh.scale = Vector3.ONE * body_scale
+	collision_shape.scale = Vector3.ONE * body_scale
 
 
 func _physics_process(delta: float) -> void:
@@ -71,6 +95,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_find_target()
+	_advance_route()
 	_apply_gravity(delta)
 
 	if _target == null:
@@ -95,17 +120,33 @@ func _physics_process(delta: float) -> void:
 
 
 func _find_target() -> void:
-	if player_cerca == false:
-		var base := get_tree().get_first_node_in_group("base") as Node3D
-		if base != null:
-			_target = base
-			return
-	else:
+	if _is_chasing_player():
 		_target = get_tree().get_first_node_in_group("player") as Node3D
-		
+	else:
+		_target = get_tree().get_first_node_in_group("base") as Node3D
+
 	if _target == null:
 		push_error("Couldnt find the target, the base is not in the tree or the player is not in range and couldnt loaded")
 	return
+
+
+func _is_chasing_player() -> bool:
+	if not player_cerca:
+		return false
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return false
+	return _has_line_of_sight(player)
+
+
+func _has_line_of_sight(target: Node3D) -> bool:
+	var space_state := get_world_3d().direct_space_state
+	var query := PhysicsRayQueryParameters3D.create(
+		global_position + Vector3.UP,
+		target.global_position + Vector3.UP,
+		1
+	)
+	return space_state.intersect_ray(query).is_empty()
 
 func _chase() -> void:
 	if _target == null:
@@ -128,13 +169,13 @@ func _update_path() -> void:
 	if _repath_timer > 0.0 and not _current_path.is_empty():
 		return
 	_repath_timer = repath_interval
-	_current_path = _navigation.find_path(global_position, _target.global_position)
+	_current_path = _navigation.find_path(global_position, _get_path_goal())
 	_path_index = 0
 
 
 func _get_path_direction() -> Vector3:
 	if _current_path.is_empty():
-		return _direction_to_target()
+		return _direction_to_goal()
 
 	while _path_index < _current_path.size():
 		var waypoint := _current_path[_path_index]
@@ -145,17 +186,49 @@ func _get_path_direction() -> Vector3:
 			continue
 		return to_waypoint.normalized()
 
-	return _direction_to_target()
+	return _direction_to_goal()
 
 
-func _direction_to_target() -> Vector3:
-	if _target == null:
+func _direction_to_goal() -> Vector3:
+	var goal := _get_path_goal()
+	var to_goal := goal - global_position
+	to_goal.y = 0.0
+	if to_goal.length() < 0.01:
 		return Vector3.ZERO
-	var to_target := _target.global_position - global_position
-	to_target.y = 0.0
-	if to_target.length() < 0.01:
-		return Vector3.ZERO
-	return to_target.normalized()
+	return to_goal.normalized()
+
+
+func set_route(route: EnemyRoute) -> void:
+	_route = route
+	_route_points = route.get_waypoints() if route != null else PackedVector3Array()
+	_route_index = 0
+	_current_path = PackedVector3Array()
+
+
+func _get_path_goal() -> Vector3:
+	if _is_chasing_player():
+		var player := get_tree().get_first_node_in_group("player") as Node3D
+		if player != null:
+			return player.global_position
+	if not _route_points.is_empty() and _route_index < _route_points.size():
+		return _route_points[_route_index]
+	if _target != null:
+		return _target.global_position
+	return global_position
+
+
+func _advance_route() -> void:
+	if _is_chasing_player() or _route_points.is_empty():
+		return
+	while _route_index < _route_points.size():
+		var waypoint := _route_points[_route_index]
+		var to_waypoint := waypoint - global_position
+		to_waypoint.y = 0.0
+		if to_waypoint.length() <= waypoint_distance:
+			_route_index += 1
+			_current_path = PackedVector3Array()
+		else:
+			break
 
 
 func _face_direction(direction: Vector3) -> void:

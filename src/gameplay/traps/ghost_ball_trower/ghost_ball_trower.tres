@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrapData" format=3 uid="uid://bghostb4ll123"]
+
+[ext_resource type="Script" uid="uid://6mllp02vdl7t" path="res://src/gameplay/traps/TrapData.gd" id="1_ghost"]
+[ext_resource type="PackedScene" uid="uid://cqwpesb004fgo" path="res://src/gameplay/traps/ghost_ball_trower/ghost_ball_trower.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_ghost")
+id = 13
+trap_name = "Lanzador espectral"
+description = "Dispara bolas fantasma hacia delante que dañan a los enemigos."
+cost = 150
+damage = 12.0
+cooldown = 1.5
+range = 12.0
+scene = ExtResource("2_scene")
+metadata/_custom_type_script = "uid://6mllp02vdl7t"

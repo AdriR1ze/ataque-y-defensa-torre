@@ -4,6 +4,21 @@ extends Node
 var player: Player = null
 var _current_level: BaseLevel
 
+const LEVELS := [
+	"res://src/levels/level_1.tscn",
+	"res://src/levels/level_2.tscn",
+	"res://src/levels/level_3.tscn",
+	"res://src/levels/level_4.tscn",
+	"res://src/levels/level_5.tscn",
+	"res://src/levels/level_6.tscn",
+	"res://src/levels/level_7.tscn",
+	"res://src/levels/level_8.tscn",
+	"res://src/levels/level_9.tscn",
+	"res://src/levels/level_10.tscn"
+]
+
+var _current_level_index := 0
+
 @onready var entity_root: Node3D = %EntityRoot
 @onready var effects_root: Node3D = %EffectsRoot
 @onready var level_root: Node3D = %LevelRoot
@@ -12,10 +27,9 @@ var _current_level: BaseLevel
 @onready var hud_layer: CanvasLayer = $HudLayer
 @onready var hud_root: Control = $HudLayer/HudRoot
 
-@onready var level_1 := "res://src/levels/level_1.tscn"
-
 
 const TRAP_SELECTION_UI := preload("res://src/gameplay/traps/trap_ui/trap_selection_ui.tscn")
+const PLAYER_HUD := preload("res://src/ui/player_hud.tscn")
 
 
 
@@ -24,7 +38,16 @@ var _selection_ui: TrapSelectionUI
 
 func _ready() -> void:
 	_init_player()
+	_setup_player_hud()
 	_show_trap_selection()
+
+
+func _setup_player_hud() -> void:
+	if player == null:
+		return
+	var hud := PLAYER_HUD.instantiate() as PlayerHUD
+	hud_root.add_child(hud)
+	hud.setup(player)
 
 
 func _show_trap_selection() -> void:
@@ -64,7 +87,7 @@ func _on_trap_selection_confirmed(
 
 	_capture_mouse.call_deferred()
 
-	load_level(level_1)
+	load_level(LEVELS[0])
 
 
 func _capture_mouse() -> void:
@@ -92,9 +115,21 @@ func _init_player() -> void:
 
 func load_level(level_scene: String) -> void:
 	print(level_scene)
+	_current_level_index = LEVELS.find(level_scene)
 	_deferred_load_level.call_deferred(
 		level_scene
 	)
+
+
+func load_next_level() -> void:
+	var next_index := _current_level_index + 1
+	if next_index >= LEVELS.size():
+		next_index = 0
+	load_level(LEVELS[next_index])
+
+
+func _on_level_completed() -> void:
+	load_next_level()
 
 
 func _deferred_load_level(
@@ -122,6 +157,8 @@ func _deferred_load_level(
 	if _current_level == null:
 		push_error("Couldn't instantiate the current level")
 		return
+
+	_current_level.level_completed.connect(_on_level_completed)
 
 	level_root.add_child(_current_level)
 

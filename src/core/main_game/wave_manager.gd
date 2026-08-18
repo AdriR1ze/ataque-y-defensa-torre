@@ -1,28 +1,75 @@
 extends Node
 class_name WaveManager
 
+signal level_completed
+
 @export var enemies: Array[PackedScene] = [
-	preload("res://src/gameplay/enemies/enemy.tscn")
+	preload("res://src/gameplay/enemies/enemy.tscn"),
+	preload("res://src/gameplay/enemies/enemy_fast.tscn"),
+	preload("res://src/gameplay/enemies/enemy_tank.tscn")
 ]
 
-@export var wave_amount_enemies := 10
+@export var countdown_duration := 10.0
+@export var max_waves := 10
+@export var debug_mode := false
+@export var base_enemies_per_wave := 5
+@export var enemies_per_wave_increment := 2
+
+const WAVE_UI_SCENE := preload("res://src/ui/wave_ui.tscn")
 
 @onready var level_root: Node3D = get_parent()
 @onready var level_spawner: Node3D = $"../Spawner"
 
+var _wave_ui: WaveUI
+var _wave_number := 0
+
 
 func _ready() -> void:
-	call_deferred("spawn_enemies", level_spawner)
-	await get_tree().create_timer(4.0).timeout
-	call_deferred("spawn_enemies", level_spawner)
+	_wave_ui = WAVE_UI_SCENE.instantiate() as WaveUI
+	add_child(_wave_ui)
+	_run_wave_loop()
 
 
-func spawn_enemies(spawner) -> void:
-	for i in range(wave_amount_enemies):
-		_spawn_enemy(enemies.pick_random(), spawner)
+func _run_wave_loop() -> void:
+	var total_waves := 1 if debug_mode else max_waves
+	var wave_number := 1
+	while true:
+		_wave_number = wave_number
+		_wave_ui.start_countdown(int(countdown_duration))
+		await _wave_ui.finished
+		_spawn_wave(wave_number)
+		await _wait_all_enemies_dead()
+
+		if Debug.debug_enabled or wave_number >= total_waves:
+			level_completed.emit()
+			return
+
+		wave_number += 1
 
 
-func _spawn_enemy(enemy_scene: PackedScene, spawner) -> void:
+func _spawn_wave(wave_number: int) -> void:
+	var amount := base_enemies_per_wave + (wave_number - 1) * enemies_per_wave_increment
+	for i in range(amount):
+		_spawn_enemy(_pick_enemy_scene(wave_number))
+
+
+func _pick_enemy_scene(wave_number: int) -> PackedScene:
+	var fast_chance := 0.0
+	var tank_chance := 0.0
+	if wave_number >= 2:
+		fast_chance = 0.3 + wave_number * 0.02
+	if wave_number >= 3:
+		tank_chance = 0.1 + wave_number * 0.02
+
+	var roll := randf()
+	if roll < tank_chance:
+		return enemies[2]
+	if roll < tank_chance + fast_chance:
+		return enemies[1]
+	return enemies[0]
+
+
+func _spawn_enemy(enemy_scene: PackedScene) -> void:
 	var enemy := enemy_scene.instantiate() as Enemy
 
 	level_root.add_child(enemy)
@@ -33,9 +80,24 @@ func _spawn_enemy(enemy_scene: PackedScene, spawner) -> void:
 		randf_range(-5.0, 5.0)
 	)
 
+	var routes := get_tree().get_nodes_in_group("enemy_routes")
+	if not routes.is_empty():
+		var route := routes.pick_random() as EnemyRoute
+		enemy.set_route(route)
+		spawn_position = route.get_start_position() + Vector3(
+			randf_range(-2.0, 2.0),
+			0.0,
+			randf_range(-2.0, 2.0)
+		)
+
 	var navigation := get_tree().get_first_node_in_group("navigation") as NavigationGrid
 	if navigation != null:
 		spawn_position = navigation.snap_to_walkable_world(spawn_position)
 
 	spawn_position.y = 1.0
 	enemy.global_position = spawn_position
+
+
+func _wait_all_enemies_dead() -> void:
+	while get_tree().get_nodes_in_group("enemies").size() > 0:
+		await get_tree().process_frame

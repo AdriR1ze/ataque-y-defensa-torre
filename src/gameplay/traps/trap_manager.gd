@@ -19,6 +19,7 @@ const TRAPS := {
 	10: preload("res://src/gameplay/traps/wind_gust_trap/wind_gust_trap.tres"),
 	11: preload("res://src/gameplay/traps/suction_trap/suction_trap.tres"),
 	12: preload("res://src/gameplay/traps/guillotine_trap/guillotine_trap.tres"),
+	13: preload("res://src/gameplay/traps/ghost_ball_trower/ghost_ball_trower.tres"),
 }
 
 
