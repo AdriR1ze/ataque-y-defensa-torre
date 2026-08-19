@@ -4,7 +4,7 @@ class_name WeaponComponent
 const SWORD_SCENE := preload("res://src/core/weapons/sword.tscn")
 const BOW_SCENE := preload("res://src/core/weapons/bow.tscn")
 
-@export var attack_recovery := 0.4
+@export var attack_recovery := 0.8
 
 var current_weapon: Node3D
 var _attacking := false

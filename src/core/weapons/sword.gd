@@ -12,6 +12,7 @@ func _ready() -> void:
 	if area == null:
 		push_error("[Sword] No se encontro Area3D en $Area3D")
 		return
+	area.monitoring = false
 	area.body_entered.connect(_on_area_body_entered)
 	if debug_hitbox:
 		debug_hitbox.visible = false

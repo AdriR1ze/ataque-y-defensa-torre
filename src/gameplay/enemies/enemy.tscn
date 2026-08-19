@@ -15,7 +15,7 @@ albedo_color = Color(1, 0.43529412, 1, 1)
 material = SubResource("StandardMaterial3D_tdeca")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_attack"]
-size = Vector3(1.289209, 2.0070312, 1.347461)
+size = Vector3(1.5, 2.2, 4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_u177a"]
 size = Vector3(4.368057, 1, 9.708149)
@@ -41,7 +41,7 @@ collision_mask = 10
 script = ExtResource("3_hitbox")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HitboxComponent" unique_id=610558294]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.023852587, 0.0063874424, -0.009227991)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0063874424, -1.5)
 shape = SubResource("BoxShape3D_attack")
 
 [node name="HealthBar" type="Node3D" parent="." unique_id=291634080]

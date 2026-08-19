@@ -28,7 +28,3 @@ func _unhandled_input(event: InputEvent) -> void:
 		)
 
 		camera.rotation.x = pitch
-
-	elif event is InputEventKey:
-		if event.pressed and event.keycode == KEY_ESCAPE:
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

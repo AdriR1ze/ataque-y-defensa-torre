@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://idwmj887361c" path="res://src/gameplay/enemies/enemy.tscn" id="1_base"]
+
+[node name="BossEnemy" instance=ExtResource("1_base")]
+move_speed = 1.2
+attack_damage = 40.0
+body_color = Color(0.7, 0.1, 0.1, 1)
+body_scale = 2.5
+max_health = 600.0
+reward = 500
+knockback_force = 0.5

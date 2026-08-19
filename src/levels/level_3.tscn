@@ -21,7 +21,6 @@ nombre_level = "Mazmorra 3"
 
 [node name="WaveManager" type="Node" parent="." unique_id=1174593540]
 script = ExtResource("2_vgtt4")
-debug_mode = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1021379507]
 environment = SubResource("Environment_dungeon")

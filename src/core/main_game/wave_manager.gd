@@ -2,6 +2,8 @@ extends Node
 class_name WaveManager
 
 signal level_completed
+signal wave_started(wave_number: int)
+signal wave_cleared
 
 @export var enemies: Array[PackedScene] = [
 	preload("res://src/gameplay/enemies/enemy.tscn"),
@@ -14,31 +16,53 @@ signal level_completed
 @export var debug_mode := false
 @export var base_enemies_per_wave := 5
 @export var enemies_per_wave_increment := 2
+@export var wave_reward := 100
+@export var wave_reward_increment := 25
+@export var boss_level := false
 
 const WAVE_UI_SCENE := preload("res://src/ui/wave_ui.tscn")
+const BOSS_SCENE := preload("res://src/gameplay/enemies/boss_enemy.tscn")
 
 @onready var level_root: Node3D = get_parent()
 @onready var level_spawner: Node3D = $"../Spawner"
 
 var _wave_ui: WaveUI
 var _wave_number := 0
+var _running := false
+var _total_waves := 0
+var is_wave_active := false
 
 
 func _ready() -> void:
+	debug_mode = debug_mode or Debug.debug_enabled
+	add_to_group("wave_manager")
 	_wave_ui = WAVE_UI_SCENE.instantiate() as WaveUI
 	add_child(_wave_ui)
 	_run_wave_loop()
 
 
+func stop() -> void:
+	_running = false
+
+
 func _run_wave_loop() -> void:
+	_running = true
 	var total_waves := 1 if debug_mode else max_waves
+	_total_waves = total_waves
 	var wave_number := 1
-	while true:
+	while _running and is_inside_tree():
 		_wave_number = wave_number
 		_wave_ui.start_countdown(int(countdown_duration))
 		await _wave_ui.finished
+		if not _running or not is_inside_tree():
+			return
 		_spawn_wave(wave_number)
 		await _wait_all_enemies_dead()
+		if not _running or not is_inside_tree():
+			return
+		is_wave_active = false
+		Economy.add_money(wave_reward + (wave_number - 1) * wave_reward_increment)
+		wave_cleared.emit()
 
 		if Debug.debug_enabled or wave_number >= total_waves:
 			level_completed.emit()
@@ -48,9 +72,13 @@ func _run_wave_loop() -> void:
 
 
 func _spawn_wave(wave_number: int) -> void:
+	is_wave_active = true
+	wave_started.emit(wave_number)
 	var amount := base_enemies_per_wave + (wave_number - 1) * enemies_per_wave_increment
 	for i in range(amount):
 		_spawn_enemy(_pick_enemy_scene(wave_number))
+	if boss_level and wave_number == _total_waves:
+		_spawn_enemy(BOSS_SCENE)
 
 
 func _pick_enemy_scene(wave_number: int) -> PackedScene:
@@ -99,5 +127,7 @@ func _spawn_enemy(enemy_scene: PackedScene) -> void:
 
 
 func _wait_all_enemies_dead() -> void:
-	while get_tree().get_nodes_in_group("enemies").size() > 0:
+	while _running and is_inside_tree():
+		if get_tree().get_nodes_in_group("enemies").is_empty():
+			return
 		await get_tree().process_frame

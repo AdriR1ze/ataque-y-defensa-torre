@@ -11,10 +11,11 @@ enum EnemyState {
 @export var move_speed := 3.0
 @export var gravity := 20.0
 @export var attack_range := 2.0
+@export var aggro_range := 20.0
 @export var attack_damage := 10.0
 @export var attack_cooldown := 1.2
 @export var attack_duration := 0.3
-@export var knockback_force := 6.0
+@export var knockback_force := 1.0
 @export var knockback_decay := 12.0
 @export var damage_flash_time := 0.12
 @export var repath_interval := 0.5
@@ -22,6 +23,7 @@ enum EnemyState {
 @export var body_color := Color(1.0, 0.44, 1.0)
 @export var body_scale := 1.0
 @export var max_health := 50.0
+@export var reward := 10
 
 var state: EnemyState = EnemyState.IDLE
 
@@ -131,12 +133,10 @@ func _find_target() -> void:
 
 
 func _is_chasing_player() -> bool:
-	if not player_cerca:
-		return false
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if player == null:
 		return false
-	return _has_line_of_sight(player)
+	return global_position.distance_to(player.global_position) <= aggro_range
 
 
 func _has_line_of_sight(target: Node3D) -> bool:
@@ -161,16 +161,28 @@ func _chase() -> void:
 
 
 func _update_path() -> void:
-	if _navigation == null:
-		_navigation = get_tree().get_first_node_in_group("navigation") as NavigationGrid
-	if _navigation == null:
+	var navigation := _get_navigation()
+	if navigation == null:
 		_current_path = PackedVector3Array()
 		return
 	if _repath_timer > 0.0 and not _current_path.is_empty():
 		return
 	_repath_timer = repath_interval
-	_current_path = _navigation.find_path(global_position, _get_path_goal())
+	_current_path = navigation.find_path(global_position, _get_path_goal())
 	_path_index = 0
+
+
+func _get_navigation() -> NavigationGrid:
+	if _navigation == null:
+		_navigation = get_tree().get_first_node_in_group("navigation") as NavigationGrid
+	return _navigation
+
+
+func _snap_to_walkable(pos: Vector3) -> Vector3:
+	var navigation := _get_navigation()
+	if navigation == null:
+		return pos
+	return navigation.snap_to_walkable_world(pos)
 
 
 func _get_path_direction() -> Vector3:
@@ -206,22 +218,23 @@ func set_route(route: EnemyRoute) -> void:
 
 
 func _get_path_goal() -> Vector3:
+	var goal := global_position
 	if _is_chasing_player():
 		var player := get_tree().get_first_node_in_group("player") as Node3D
 		if player != null:
-			return player.global_position
-	if not _route_points.is_empty() and _route_index < _route_points.size():
-		return _route_points[_route_index]
-	if _target != null:
-		return _target.global_position
-	return global_position
+			goal = player.global_position
+	elif not _route_points.is_empty() and _route_index < _route_points.size():
+		goal = _route_points[_route_index]
+	elif _target != null:
+		goal = _target.global_position
+	return _snap_to_walkable(goal)
 
 
 func _advance_route() -> void:
 	if _is_chasing_player() or _route_points.is_empty():
 		return
 	while _route_index < _route_points.size():
-		var waypoint := _route_points[_route_index]
+		var waypoint := _snap_to_walkable(_route_points[_route_index])
 		var to_waypoint := waypoint - global_position
 		to_waypoint.y = 0.0
 		if to_waypoint.length() <= waypoint_distance:
@@ -334,6 +347,7 @@ func set_state(new_state: EnemyState) -> void:
 func _on_died() -> void:
 	set_state(EnemyState.DEAD)
 	hitbox_component.deactivate()
+	Economy.add_money(reward)
 	queue_free()
 
 

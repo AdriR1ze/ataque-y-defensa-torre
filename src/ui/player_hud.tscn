@@ -12,15 +12,24 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_hud")
 
+[node name="MoneyLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 220.0
+offset_bottom = 44.0
+theme_override_font_sizes/font_size = 22
+text = "$0"
+
 [node name="HealthBox" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
+anchors_preset = 0
 offset_left = 12.0
-offset_top = -64.0
+offset_top = 48.0
 offset_right = 260.0
-offset_bottom = -12.0
+offset_bottom = 100.0
 grow_vertical = 0
 
 [node name="HealthLabel" type="Label" parent="HealthBox"]

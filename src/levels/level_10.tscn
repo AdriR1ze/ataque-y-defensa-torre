@@ -21,6 +21,7 @@ nombre_level = "Mazmorra 10"
 
 [node name="WaveManager" type="Node" parent="." unique_id=78765012]
 script = ExtResource("2_vgtt4")
+boss_level = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=878158548]
 environment = SubResource("Environment_dungeon")
@@ -48,7 +49,7 @@ data = {
 }
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
-[node name="Spawner" type="Marker3D" parent="." groups=["spawner"] unique_id=752602933]
+[node name="Spawner" type="Marker3D" parent="." unique_id=752602933 groups=["spawner"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.8251607, 10)
 
 [node name="NavigationGrid" type="Node" parent="." unique_id=40595219]

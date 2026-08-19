@@ -21,6 +21,7 @@ nombre_level = "Mazmorra 5"
 
 [node name="WaveManager" type="Node" parent="."]
 script = ExtResource("2_vgtt4")
+boss_level = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_dungeon")

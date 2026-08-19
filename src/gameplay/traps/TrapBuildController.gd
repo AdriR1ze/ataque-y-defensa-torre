@@ -13,6 +13,7 @@ const COLLISION_MASK := 9
 const RAY_DISTANCE := 100.0
 const FREE_ROTATION_STEP := 15.0
 const OVERLAP_MARGIN := 0.05
+const SELL_DISTANCE := 1.5
 
 
 @onready var trap_manager: TrapManager = $"../TrapManager"
@@ -53,6 +54,22 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 
 		if build_mode:
+
+			if event.keycode == KEY_R:
+				_rotate_preview(1)
+				get_viewport().set_input_as_handled()
+				return
+
+			if event.keycode == KEY_U:
+				_try_upgrade_trap(0)
+				get_viewport().set_input_as_handled()
+				return
+
+			if event.keycode == KEY_I:
+				_try_upgrade_trap(1)
+				get_viewport().set_input_as_handled()
+				return
+
 			var slot := _slot_for_key(event.keycode)
 
 			if slot != 0:
@@ -79,6 +96,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 			MOUSE_BUTTON_LEFT:
 				try_place_trap()
+				get_viewport().set_input_as_handled()
+
+			MOUSE_BUTTON_RIGHT:
+				_try_sell_trap()
 				get_viewport().set_input_as_handled()
 
 
@@ -278,11 +299,13 @@ func _update_preview() -> void:
 	):
 		valid = false
 
-	_set_preview_valid(valid)
+	var affordable := _selected_is_affordable()
+
+	_set_preview_valid(valid and affordable)
 
 	_apply_material_override(
 		_preview,
-		_material_valid if valid else _material_invalid
+		_material_valid if (valid and affordable) else _material_invalid
 	)
 
 
@@ -387,6 +410,16 @@ func _get_camera() -> Camera3D:
 	) as Camera3D
 
 
+func _selected_is_affordable() -> bool:
+
+	var trap_data := trap_manager.get_selected_trap()
+
+	if trap_data == null:
+		return false
+
+	return Economy.can_afford(trap_data.cost)
+
+
 func try_place_trap() -> void:
 
 	if not build_mode:
@@ -406,10 +439,123 @@ func try_place_trap() -> void:
 	if trap_data.scene == null:
 		return
 
-	var trap: Node3D = trap_data.scene.instantiate()
+	if not Economy.spend_money(trap_data.cost):
+		return
+
+	var trap := trap_data.scene.instantiate() as Trap
+
+	if trap == null:
+		return
+
+	trap.cost = trap_data.cost
+	trap.trap_id = trap_data.id
 
 	entity_root.add_child(trap)
 
 	trap.global_transform = _preview.global_transform
 
 	trap.add_to_group(GROUP_TRAPS)
+
+
+func _try_sell_trap() -> void:
+
+	if not build_mode:
+		return
+
+	if not _can_sell():
+		return
+
+	var result := _get_center_ray_hit()
+
+	if result.is_empty():
+		return
+
+	var trap := _find_trap_near(
+		result.get("position") as Vector3
+	)
+
+	if trap == null:
+		return
+
+	Economy.add_money(trap.cost)
+	trap.queue_free()
+
+
+func _try_upgrade_trap(path: int) -> void:
+
+	if not build_mode:
+		return
+
+	var result := _get_center_ray_hit()
+
+	if result.is_empty():
+		return
+
+	var trap := _find_trap_near(
+		result.get("position") as Vector3
+	)
+
+	if trap == null:
+		return
+
+	TrapUpgrades.try_upgrade(trap, path)
+
+
+func _can_sell() -> bool:
+
+	var wave_manager := get_tree().get_first_node_in_group(
+		"wave_manager"
+	) as WaveManager
+
+	if wave_manager == null:
+		return true
+
+	return not wave_manager.is_wave_active
+
+
+func _find_trap_near(position: Vector3) -> Trap:
+
+	var nearest: Trap = null
+	var nearest_dist := SELL_DISTANCE
+
+	for placed in get_tree().get_nodes_in_group(GROUP_TRAPS):
+
+		var placed_trap := placed as Trap
+
+		if placed_trap == null:
+			continue
+
+		var dist := placed_trap.global_position.distance_to(position)
+
+		if dist < nearest_dist:
+			nearest_dist = dist
+			nearest = placed_trap
+
+	return nearest
+
+
+func _get_center_ray_hit() -> Dictionary:
+
+	var camera := _get_camera()
+
+	if camera == null:
+		return {}
+
+	var viewport_size := get_viewport().get_visible_rect().size
+
+	var from := camera.project_ray_origin(
+		viewport_size * 0.5
+	)
+
+	var to := from + camera.project_ray_normal(
+		viewport_size * 0.5
+	) * RAY_DISTANCE
+
+	var query := PhysicsRayQueryParameters3D.create(
+		from,
+		to
+	)
+
+	query.collision_mask = COLLISION_MASK
+
+	return get_viewport().get_world_3d().direct_space_state.intersect_ray(query)

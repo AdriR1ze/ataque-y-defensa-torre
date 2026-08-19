@@ -1,4 +1,4 @@
-extends StaticBody3D
+extends Trap
 class_name GhostBallTrower
 
 const PROJECTILE_SCENE := preload("res://src/gameplay/traps/bullets/ghost_ball_projectile.tscn")
@@ -10,6 +10,8 @@ const PROJECTILE_SCENE := preload("res://src/gameplay/traps/bullets/ghost_ball_p
 
 
 func _on_cooldown_timeout() -> void:
+	if not active:
+		return
 	_fire_forward()
 
 
