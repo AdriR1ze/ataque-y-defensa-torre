@@ -7,8 +7,15 @@ signal main_menu_pressed
 signal quit_pressed
 
 
+const OPTIONS_MENU := preload("res://src/ui/options_menu.tscn")
+
+
+var _debug_level_btn: Button
+
+
 func _ready() -> void:
 	visible = false
+	Debug.debug_mode_changed.connect(_on_debug_mode_changed)
 	_build_ui()
 
 
@@ -37,8 +44,26 @@ func _build_ui() -> void:
 
 	panel.add_child(_make_button("Reanudar", _on_resume_pressed))
 	panel.add_child(_make_button("Reiniciar nivel", _on_restart_pressed))
+
+	_debug_level_btn = _make_button("Selector de Niveles (DEBUG)", _on_debug_level_selector_pressed)
+	_debug_level_btn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+	_debug_level_btn.visible = Debug.debug_enabled
+	panel.add_child(_debug_level_btn)
+
+	panel.add_child(_make_button("Opciones", _on_options_pressed))
 	panel.add_child(_make_button("Menú principal", _on_main_menu_pressed))
 	panel.add_child(_make_button("Salir", _on_quit_pressed))
+
+
+func _on_debug_mode_changed(enabled: bool) -> void:
+	if _debug_level_btn != null:
+		_debug_level_btn.visible = enabled
+
+
+func _on_debug_level_selector_pressed() -> void:
+	if Debug.debug_enabled:
+		Debug.open_level_selector(self)
+
 
 
 func _make_button(text: String, callback: Callable) -> Button:
@@ -55,6 +80,12 @@ func _on_resume_pressed() -> void:
 
 func _on_restart_pressed() -> void:
 	restart_pressed.emit()
+
+
+func _on_options_pressed() -> void:
+	var options := OPTIONS_MENU.instantiate() as OptionsMenu
+	options.closed.connect(options.queue_free)
+	add_child(options)
 
 
 func _on_main_menu_pressed() -> void:

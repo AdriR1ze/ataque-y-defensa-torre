@@ -60,16 +60,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 				return
 
-			if event.keycode == KEY_U:
-				_try_upgrade_trap(0)
-				get_viewport().set_input_as_handled()
-				return
-
-			if event.keycode == KEY_I:
-				_try_upgrade_trap(1)
-				get_viewport().set_input_as_handled()
-				return
-
 			var slot := _slot_for_key(event.keycode)
 
 			if slot != 0:
@@ -479,26 +469,6 @@ func _try_sell_trap() -> void:
 
 	Economy.add_money(trap.cost)
 	trap.queue_free()
-
-
-func _try_upgrade_trap(path: int) -> void:
-
-	if not build_mode:
-		return
-
-	var result := _get_center_ray_hit()
-
-	if result.is_empty():
-		return
-
-	var trap := _find_trap_near(
-		result.get("position") as Vector3
-	)
-
-	if trap == null:
-		return
-
-	TrapUpgrades.try_upgrade(trap, path)
 
 
 func _can_sell() -> bool:

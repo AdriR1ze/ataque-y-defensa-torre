@@ -35,6 +35,7 @@ script = null
 [node name="WeaponMarker" type="Marker3D" parent="CameraComponent/Camera3D" unique_id=46528873]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.35, -0.7)
 
+
 [node name="WeaponComponent" type="Node" parent="." unique_id=1741450054]
 script = ExtResource("6_dxsvo")
 
@@ -42,3 +43,4 @@ script = ExtResource("6_dxsvo")
 script = ExtResource("7_health")
 
 [node name="RayCast3D" type="RayCast3D" parent="." unique_id=571304559]
+

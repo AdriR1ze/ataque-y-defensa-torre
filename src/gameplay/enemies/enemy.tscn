@@ -4,15 +4,11 @@
 [ext_resource type="Script" uid="uid://r8flawm71whu" path="res://src/core/components/health_component.gd" id="2_health"]
 [ext_resource type="Script" uid="uid://j05kvmf4lwws" path="res://src/core/components/hitbox_component.gd" id="3_hitbox"]
 [ext_resource type="Script" uid="uid://4bmyj3rk8ttl" path="res://src/core/components/health_bar_component.gd" id="4_healthbar"]
+[ext_resource type="PackedScene" uid="uid://b8arana3dglb" path="res://assets/arana.glb" id="5_arana_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u177a"]
-radius = 0.4
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tdeca"]
-albedo_color = Color(1, 0.43529412, 1, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_u177a"]
-material = SubResource("StandardMaterial3D_tdeca")
+radius = 0.45
+height = 1.2
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_attack"]
 size = Vector3(1.5, 2.2, 4)
@@ -26,10 +22,11 @@ collision_mask = 11
 script = ExtResource("1_enemy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1638285643]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 shape = SubResource("CapsuleShape3D_u177a")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=300099415]
-mesh = SubResource("CapsuleMesh_u177a")
+[node name="Model" parent="." instance=ExtResource("5_arana_model")]
+unique_id = 88392019
 
 [node name="HealthComponent" type="Node" parent="." unique_id=483920175]
 script = ExtResource("2_health")

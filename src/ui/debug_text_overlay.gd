@@ -12,7 +12,8 @@ func _process(_delta: float) -> void:
 	if level != null:
 		level_text = str(level)
 
-	debug_label.text = "Nivel: %s | Debug: %s" % [
+	debug_label.text = "Nivel: %s | Debug: %s %s" % [
 		level_text,
-		"ON" if Debug.debug_enabled else "OFF"
+		"ON" if Debug.debug_enabled else "OFF",
+		"(Tecla [L] Niveles)" if Debug.debug_enabled else ""
 	]

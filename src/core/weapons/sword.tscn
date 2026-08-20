@@ -1,15 +1,7 @@
-[gd_scene format=3 uid="uid://deg5hgh7rcxij"]
+[gd_scene load_steps=5 format=3 uid="uid://deg5hgh7rcxij"]
 
 [ext_resource type="Script" uid="uid://bqxb6no6aa0jb" path="res://src/core/weapons/sword.gd" id="1_sword_script"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_blade"]
-size = Vector3(0.12, 0.7, 0.04)
-
-[sub_resource type="BoxMesh" id="BoxMesh_handle"]
-size = Vector3(0.06, 0.25, 0.06)
-
-[sub_resource type="BoxMesh" id="BoxMesh_guard"]
-size = Vector3(0.2, 0.06, 0.06)
+[ext_resource type="PackedScene" uid="uid://cs0kmb36cv443" path="res://assets/espada_realista.glb" id="2_espada_model"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(0.25, 0.9, 3.4475098)
@@ -25,17 +17,8 @@ size = Vector3(0.25, 0.9, 3.4545898)
 [node name="Sword" type="Node3D" unique_id=375903021]
 script = ExtResource("1_sword_script")
 
-[node name="Blade" type="MeshInstance3D" parent="." unique_id=410653989]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -0.45)
-mesh = SubResource("BoxMesh_blade")
-
-[node name="Handle" type="MeshInstance3D" parent="." unique_id=1843860151]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0.05)
-mesh = SubResource("BoxMesh_handle")
-
-[node name="Guard" type="MeshInstance3D" parent="." unique_id=1806044261]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0.05)
-mesh = SubResource("BoxMesh_guard")
+[node name="Model" parent="." instance=ExtResource("2_espada_model")]
+unique_id = 99128371
 
 [node name="Area3D" type="Area3D" parent="." unique_id=788938347]
 visible = false

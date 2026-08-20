@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://c3ph87s4bqqh6"]
+
+[ext_resource type="Script" uid="uid://kx5vfbdywjn5" path="res://src/levels/tutorial.gd" id="1_n4f5v"]
+[ext_resource type="PackedScene" uid="uid://b5nak4c8w2e1f" path="res://src/ui/combat_focus_overlay.tscn" id="2_focus_overlay"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1jvh8"]
+albedo_color = Color(0.5639223, 0.64736766, 0.13576469, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mmw0q"]
+material = SubResource("StandardMaterial3D_1jvh8")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_u177a"]
+size = Vector3(28.955582, 0.01373291, 20.5979)
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_gy0p7"]
+
+[sub_resource type="Sky" id="Sky_tdeca"]
+sky_material = SubResource("PhysicalSkyMaterial_gy0p7")
+
+[sub_resource type="Environment" id="Environment_u177a"]
+background_mode = 1
+background_color = Color(0.88, 0.89, 0.92, 1)
+sky = SubResource("Sky_tdeca")
+ambient_light_source = 2
+ambient_light_color = Color(0.82, 0.84, 0.88, 1)
+ambient_light_energy = 0.7
+fog_enabled = true
+fog_light_color = Color(0.88, 0.89, 0.92, 1)
+fog_light_energy = 0.9
+fog_sun_scatter = 0.1
+fog_density = 0.09
+fog_depth_begin = 2.0
+fog_depth_end = 14.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.1
+volumetric_fog_albedo = Color(0.88, 0.89, 0.92, 1)
+volumetric_fog_length = 14.0
+
+[node name="Tutorial" type="Node3D" unique_id=1929670577]
+script = ExtResource("1_n4f5v")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1684666845]
+collision_layer = 3
+collision_mask = 3
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=664364679]
+transform = Transform3D(14.596241, 0, 0, 0, 1, 0, 0, 0, 11.418089, 0, 0, 0)
+mesh = SubResource("PlaneMesh_mmw0q")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1823125305]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08089447, -0.0018615723, -0.9437256)
+shape = SubResource("BoxShape3D_u177a")
+
+[node name="PlayerSpawner" type="Marker3D" parent="." unique_id=391847265]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="CombatFocusOverlay" parent="." unique_id=194820381 instance=ExtResource("2_focus_overlay")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=842001807]
+environment = SubResource("Environment_u177a")

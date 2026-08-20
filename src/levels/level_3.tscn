@@ -7,34 +7,12 @@
 [ext_resource type="Script" uid="uid://bont0clmdcxw4" path="res://src/core/navigation/navigation_grid.gd" id="7_nav"]
 [ext_resource type="Script" uid="uid://c8k3waw2q705m" path="res://src/gameplay/enemies/enemy_route.gd" id="8_route"]
 
-[sub_resource type="Environment" id="Environment_dungeon"]
-background_mode = 1
-background_color = Color(0.1, 0.1, 0.13, 1)
-ambient_light_source = 2
-ambient_light_color = Color(0.45, 0.42, 0.4, 1)
-
-[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_dungeon"]
-
 [node name="Level3" type="Node3D" unique_id=1285520189]
 script = ExtResource("1_lvl")
 nombre_level = "Mazmorra 3"
 
 [node name="WaveManager" type="Node" parent="." unique_id=1174593540]
 script = ExtResource("2_vgtt4")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1021379507]
-environment = SubResource("Environment_dungeon")
-camera_attributes = SubResource("CameraAttributesPractical_dungeon")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=412413624]
-transform = Transform3D(1, 0, 0, 0, 0.48830837, 0.8726713, 0, -0.8726713, 0.48830837, 0, 6, 8)
-light_energy = 1.4
-
-[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1329233395]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
-light_color = Color(1, 0.8, 0.6, 1)
-light_energy = 2.0
-omni_range = 18.0
 
 [node name="Base" parent="." unique_id=1347610115 instance=ExtResource("3_u5ev4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1, -7)

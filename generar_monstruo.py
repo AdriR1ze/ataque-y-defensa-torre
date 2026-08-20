@@ -367,36 +367,72 @@ def hacer_skinning(armature, cuerpo, ojos, pupilas):
 # 6. CREAR ESPADA
 # ──────────────────────────────────────────────────────────────
 
-def crear_espada(mat_metal):
+def crear_espada(mat_metal, mat_cuero=None, mat_laton=None):
     bpy.ops.object.select_all(action='DESELECT')
 
-    # Hoja
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0))
-    hoja = bpy.context.active_object
-    hoja.name = "Espada_Hoja"
-    hoja.scale = (0.08, 0.03, 1.0)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    if mat_cuero is None:
+        mat_cuero = crear_material("M_Cuero", (0.16, 0.10, 0.06, 1.0))
+    if mat_laton is None:
+        mat_laton = crear_material("M_Laton", (0.85, 0.68, 0.32, 1.0))
+
+    # 1. HOJA (Double-edged tapered medieval blade with fuller groove)
+    mesh_hoja = bpy.data.meshes.new("Espada_Hoja_Mesh")
+    hoja = bpy.data.objects.new("Espada_Hoja", mesh_hoja)
+    bpy.context.collection.objects.link(hoja)
+
+    # Geometry vertices
+    z_base = 0.0
+    z_mid = 1.2
+    z_tip = 1.6
+
+    verts = [
+        # Base section (z=0)
+        (-0.06, 0, z_base), (-0.02, 0.012, z_base), (0, 0.007, z_base), (0.02, 0.012, z_base),
+        (0.06, 0, z_base), (0.02, -0.012, z_base), (0, -0.007, z_base), (-0.02, -0.012, z_base),
+        # Mid section (z=1.2)
+        (-0.04, 0, z_mid), (-0.012, 0.008, z_mid), (0, 0.005, z_mid), (0.012, 0.008, z_mid),
+        (0.04, 0, z_mid), (0.012, -0.008, z_mid), (0, -0.005, z_mid), (-0.012, -0.008, z_mid),
+        # Tip point (z=1.6)
+        (0, 0, z_tip)
+    ]
+
+    faces = []
+    # Side quads
+    for i in range(8):
+        nxt = (i + 1) % 8
+        faces.append([i, nxt, nxt + 8, i + 8])
+    # Tip fan
+    for i in range(8):
+        nxt = (i + 1) % 8
+        faces.append([i + 8, nxt + 8, 16])
+
+    mesh_hoja.from_pydata(verts, [], faces)
+    mesh_hoja.update()
     asignar_material(hoja, mat_metal)
 
-    # Guarda
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, -1.05))
+    # 2. GUARDA (Curved cruciform quillons)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, -0.04))
     guarda = bpy.context.active_object
     guarda.name = "Espada_Guarda"
-    guarda.scale = (0.3, 0.08, 0.06)
+    guarda.scale = (0.45, 0.08, 0.07)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     asignar_material(guarda, mat_metal)
 
-    # Empunadura
-    bpy.ops.mesh.primitive_cylinder_add(radius=0.06, depth=0.4, location=(0, 0, -1.3))
+    # 3. EMPUÑADURA (Contoured leather grip)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.04, depth=0.35, location=(0, 0, -0.25))
     empunadura = bpy.context.active_object
     empunadura.name = "Espada_Empunadura"
-    asignar_material(empunadura, mat_metal)
+    empunadura.scale = (0.75, 1.1, 1.0)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    asignar_material(empunadura, mat_cuero)
 
-    # Pommel
-    bpy.ops.mesh.primitive_uv_sphere_add(radius=0.07, location=(0, 0, -1.55))
+    # 4. POMMEL (Wheel pommel disc + brass medallion)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.08, depth=0.06, location=(0, 0, -0.48))
     pommel = bpy.context.active_object
     pommel.name = "Espada_Pommel"
-    asignar_material(pommel, mat_metal)
+    pommel.rotation_euler = Euler((math.radians(90), 0, 0), 'XYZ')
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
+    asignar_material(pommel, mat_laton)
 
     # Unir espada
     bpy.ops.object.select_all(action='DESELECT')
@@ -404,7 +440,7 @@ def crear_espada(mat_metal):
         obj = bpy.data.objects.get(name)
         if obj:
             obj.select_set(True)
-    bpy.context.view_layer.objects.active = bpy.data.objects.get("Espada_Hoja")
+    bpy.context.view_layer.objects.active = hoja
     bpy.ops.object.join()
     espada = bpy.context.active_object
     espada.name = "Espada"

@@ -16,7 +16,8 @@ const INITIAL_MONEY := 100
 var player: Player = null
 var _current_level: BaseLevel
 
-const LEVELS := [
+const LEVELS: Array[String] = [
+	"res://src/levels/tutorial.tscn",
 	"res://src/levels/level_1.tscn",
 	"res://src/levels/level_2.tscn",
 	"res://src/levels/level_3.tscn",
@@ -57,22 +58,93 @@ var _end_screen: EndScreen
 var _build_hud: BuildHUD
 
 
+var _has_selected_traps := false
+
+
 func _ready() -> void:
+	add_to_group("main_game")
 	_init_player()
 	_setup_player_hud()
 	_setup_build_hud()
 	_setup_pause_menu()
 	_setup_end_screen()
-	_show_trap_selection()
+
+	if Debug.selected_level_index >= 0:
+		_current_level_index = Debug.selected_level_index
+		Debug.selected_level_index = -1
+
+	if _is_tutorial_level(LEVELS[_current_level_index]):
+		_start_tutorial_directly()
+	else:
+		_show_trap_selection()
+
+
+func _is_tutorial_level(level_path: String) -> bool:
+	return level_path.contains("tutorial")
+
+
+func _start_tutorial_directly() -> void:
+	trap_manager.apply_selection({})
+	_grant_initial_money()
+
+	if _build_hud != null:
+		_build_hud.visible = false
+
+	if player != null:
+		player.process_mode = Node.PROCESS_MODE_PAUSABLE
+
+
+	_capture_mouse.call_deferred()
+
+	_state = GameState.PLAYING
+
+	load_level(LEVELS[_current_level_index])
+
+
+func load_level_by_index(index: int) -> void:
+	if index < 0 or index >= LEVELS.size():
+		return
+
+	_current_level_index = index
+	_state = GameState.PLAYING
+	get_tree().paused = false
+
+	if _pause_menu != null:
+		_pause_menu.visible = false
+	if _end_screen != null:
+		_end_screen.visible = false
+	if _selection_ui != null:
+		_selection_ui.queue_free()
+		_selection_ui = null
+
+	_stop_current_level()
+	_clear_run_state()
+	_reset_player()
+
+	if _is_tutorial_level(LEVELS[_current_level_index]):
+		_start_tutorial_directly()
+	else:
+		_grant_initial_money()
+		if player != null:
+			player.process_mode = Node.PROCESS_MODE_PAUSABLE
+		_capture_mouse.call_deferred()
+		load_level(LEVELS[_current_level_index])
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Debug.debug_enabled and event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_L:
+			get_viewport().set_input_as_handled()
+			Debug.open_level_selector(hud_layer)
+			return
+
 	if event.is_action_pressed("pause"):
 		get_viewport().set_input_as_handled()
 		if _state == GameState.PLAYING:
 			_pause_game()
 		elif _state == GameState.PAUSED:
 			_resume_game()
+
 
 
 func _setup_player_hud() -> void:
@@ -132,6 +204,8 @@ func _on_trap_selection_confirmed(
 	selection: Dictionary
 ) -> void:
 
+	_has_selected_traps = true
+
 	trap_manager.apply_selection(selection)
 
 	_grant_initial_money()
@@ -147,7 +221,7 @@ func _on_trap_selection_confirmed(
 
 	_state = GameState.PLAYING
 
-	load_level(LEVELS[0])
+	load_level(LEVELS[_current_level_index])
 
 
 func _capture_mouse() -> void:
@@ -188,7 +262,14 @@ func load_next_level() -> void:
 	if next_index >= LEVELS.size():
 		_on_victory()
 		return
-	load_level(LEVELS[next_index])
+	
+	var next_scene: String = LEVELS[next_index]
+	_current_level_index = next_index
+
+	if not _is_tutorial_level(next_scene) and not _has_selected_traps:
+		_show_trap_selection()
+	else:
+		load_level(next_scene)
 
 
 func _on_level_completed() -> void:
@@ -229,7 +310,11 @@ func _deferred_load_level(
 
 	level_root.add_child(_current_level)
 
+	if _build_hud != null:
+		_build_hud.visible = not _is_tutorial_level(level_scene)
+
 	await get_tree().process_frame
+
 
 	_connect_base_destroyed()
 

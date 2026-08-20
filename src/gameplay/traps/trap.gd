@@ -18,25 +18,10 @@ enum SurfaceOrientation {
 var active := true
 var cost := 0
 var trap_id := 0
-var damage_multiplier := 1.0
-var area_multiplier := 1.0
-var upgrade_levels := [0, 0]
 
 
 func set_active(new_active: bool) -> void:
 	active = new_active
-
-
-func apply_upgrade(effect: Dictionary) -> void:
-	if effect.has("damage_mult"):
-		damage_multiplier *= effect["damage_mult"]
-	if effect.has("area_mult"):
-		area_multiplier *= effect["area_mult"]
-	_on_upgraded(effect)
-
-
-func _on_upgraded(_effect: Dictionary) -> void:
-	pass
 
 
 func is_surface_valid(normal: Vector3) -> bool:

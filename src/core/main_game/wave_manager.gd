@@ -52,6 +52,7 @@ func _run_wave_loop() -> void:
 	var wave_number := 1
 	while _running and is_inside_tree():
 		_wave_number = wave_number
+		Music.set_game_state(Music.State.PLANNING)
 		_wave_ui.start_countdown(int(countdown_duration))
 		await _wave_ui.finished
 		if not _running or not is_inside_tree():
@@ -65,6 +66,7 @@ func _run_wave_loop() -> void:
 		wave_cleared.emit()
 
 		if Debug.debug_enabled or wave_number >= total_waves:
+			Music.set_game_state(Music.State.MENU)
 			level_completed.emit()
 			return
 
@@ -74,6 +76,11 @@ func _run_wave_loop() -> void:
 func _spawn_wave(wave_number: int) -> void:
 	is_wave_active = true
 	wave_started.emit(wave_number)
+	if boss_level and wave_number == _total_waves:
+		Music.set_game_state(Music.State.BOSS)
+	else:
+		Music.set_game_state(Music.State.COMBAT)
+
 	var amount := base_enemies_per_wave + (wave_number - 1) * enemies_per_wave_increment
 	for i in range(amount):
 		_spawn_enemy(_pick_enemy_scene(wave_number))

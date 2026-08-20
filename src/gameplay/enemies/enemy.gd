@@ -44,8 +44,19 @@ var _route_index := 0
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var hitbox_component: HitboxComponent = $HitboxComponent
-@onready var mesh: MeshInstance3D = $MeshInstance3D
+@onready var mesh: MeshInstance3D = get_node_or_null("MeshInstance3D")
+@onready var model_node: Node3D = get_node_or_null("Model")
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
+@onready var anim_player: AnimationPlayer = _find_animation_player(self)
+
+func _find_animation_player(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node as AnimationPlayer
+	for child in node.get_children():
+		var res := _find_animation_player(child)
+		if res:
+			return res
+	return null
 
 var _damage_material := StandardMaterial3D.new()
 
@@ -67,13 +78,17 @@ func _apply_appearance() -> void:
 	health_component.max_health = max_health
 	health_component.current_health = max_health
 
-	var material := StandardMaterial3D.new()
-	material.albedo_color = body_color
-	material.emission = body_color
-	material.emission_energy_multiplier = 0.3
-	mesh.set_surface_override_material(0, material)
+	if mesh:
+		var material := StandardMaterial3D.new()
+		material.albedo_color = body_color
+		material.emission = body_color
+		material.emission_energy_multiplier = 0.3
+		mesh.set_surface_override_material(0, material)
+		mesh.scale = Vector3.ONE * body_scale
 
-	mesh.scale = Vector3.ONE * body_scale
+	if model_node:
+		model_node.scale = Vector3.ONE * body_scale
+
 	collision_shape.scale = Vector3.ONE * body_scale
 
 
@@ -328,20 +343,43 @@ func _on_damaged(_amount: float) -> void:
 
 
 func _flash_damage() -> void:
-	if mesh == null:
+	if mesh == null and model_node == null:
 		return
 	if _flash_tween:
 		_flash_tween.kill()
-	mesh.material_override = _damage_material
+	var target_node: Node3D = mesh if mesh else model_node
+	target_node.material_override = _damage_material
 	_flash_tween = create_tween()
 	_flash_tween.tween_interval(damage_flash_time)
-	_flash_tween.tween_callback(func() -> void: mesh.material_override = null)
+	_flash_tween.tween_callback(func() -> void: target_node.material_override = null)
 
 
 func set_state(new_state: EnemyState) -> void:
 	if state == new_state:
 		return
 	state = new_state
+	_play_state_animation()
+
+
+func _play_state_animation() -> void:
+	if anim_player == null:
+		return
+	match state:
+		EnemyState.IDLE:
+			_play_anim(["Arana_Idle", "Track_Idle", "Idle"])
+		EnemyState.CHASING:
+			_play_anim(["Arana_Caminar", "Track_Caminar", "Caminar", "Walk"])
+		EnemyState.ATTACKING:
+			_play_anim(["Arana_Ataque", "Track_Ataque", "Ataque", "Attack"])
+
+
+func _play_anim(anim_names: Array) -> void:
+	if anim_player == null:
+		return
+	for anim in anim_names:
+		if anim_player.has_animation(anim):
+			anim_player.play(anim)
+			break
 
 
 func _on_died() -> void:

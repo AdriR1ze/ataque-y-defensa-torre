@@ -20,7 +20,8 @@ config/icon="res://icon.svg"
 
 Debug="*res://src/core/debug/debug.gd"
 Economy="*res://src/core/economy/economy.gd"
-TrapUpgrades="*res://src/gameplay/traps/trap_upgrades.gd"
+Settings="*res://src/core/settings/settings.gd"
+Music="*res://src/core/music/music.gd"
 
 [display]
 

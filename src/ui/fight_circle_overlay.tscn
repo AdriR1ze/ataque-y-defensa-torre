@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://c6v2n5k8y7w1q"]
+
+[ext_resource type="Script" uid="uid://c7m9k2b4w8e1f" path="res://src/ui/fight_circle_overlay.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://b1n7m3k9w5e2x" path="res://src/shaders/camera_fight_ring.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_circle"]
+shader = ExtResource("2_shader")
+shader_parameter/outer_color = Color(1, 1, 1, 1)
+shader_parameter/base_radius = 0.65
+shader_parameter/noise_intensity = 0.035
+shader_parameter/noise_scale = 16.0
+shader_parameter/noise_speed = 4.0
+shader_parameter/edge_sharpness = 0.005
+
+[node name="FightCircleOverlay" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_script")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_circle")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
