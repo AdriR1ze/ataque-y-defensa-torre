@@ -347,11 +347,20 @@ func _flash_damage() -> void:
 		return
 	if _flash_tween:
 		_flash_tween.kill()
-	var target_node: Node3D = mesh if mesh else model_node
-	target_node.material_override = _damage_material
+	var target_node: Node = mesh if mesh else model_node
+	_apply_material_override(target_node, _damage_material)
 	_flash_tween = create_tween()
 	_flash_tween.tween_interval(damage_flash_time)
-	_flash_tween.tween_callback(func() -> void: target_node.material_override = null)
+	_flash_tween.tween_callback(func() -> void: _apply_material_override(target_node, null))
+
+
+func _apply_material_override(node: Node, mat: Material) -> void:
+	if node == null:
+		return
+	if node is GeometryInstance3D:
+		(node as GeometryInstance3D).material_override = mat
+	for child in node.get_children():
+		_apply_material_override(child, mat)
 
 
 func set_state(new_state: EnemyState) -> void:
