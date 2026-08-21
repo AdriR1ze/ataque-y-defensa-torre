@@ -11,17 +11,22 @@ const SPAWNER_MARKER_TEXTURE := "res://assets/skull.svg"
 const TYRANT_ENVIRONMENT := preload("res://src/resources/environment_tyrant.tres")
 
 
-func get_default_player_spawn():
+func get_default_player_spawn() -> Vector3:
+	var spawner := get_node_or_null("PlayerSpawner") as Node3D
+	if spawner != null:
+		return spawner.global_position
 	return Vector3(10, 10, 10)
+
 
 
 func _ready() -> void:
 	add_to_group("current_level")
 	_setup_lighting()
 	_spawn_indicators()
-	var wave_manager := get_node_or_null("WaveManager") as WaveManager
-	if wave_manager != null:
+	var wave_manager: Node = get_node_or_null("WaveManager")
+	if wave_manager != null and wave_manager.has_signal("level_completed"):
 		wave_manager.level_completed.connect(_on_level_completed)
+
 
 
 func _setup_lighting() -> void:

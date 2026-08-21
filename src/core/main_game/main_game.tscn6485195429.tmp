@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://dcsw83k218mix"]
+
+[ext_resource type="Script" uid="uid://cbyws34liyecw" path="res://src/core/main_game/main_game.gd" id="1_3fed5"]
+[ext_resource type="PackedScene" uid="uid://ucblt1tlt68g" path="res://src/ui/debug_text_overlay.tscn" id="2_6yl8a"]
+[ext_resource type="Script" uid="uid://vg00mb2kgj3r" path="res://src/gameplay/traps/trap_manager.gd" id="3_trapmgr"]
+[ext_resource type="Script" uid="uid://bp2x2p6mmm61x" path="res://src/gameplay/traps/TrapBuildController.gd" id="4_tk58t"]
+
+[node name="MainGame" type="Node" unique_id=433348220]
+process_mode = 3
+script = ExtResource("1_3fed5")
+
+[node name="System" type="Node" parent="." unique_id=1801437223]
+
+[node name="TrapManager" type="Node" parent="System" unique_id=962725771]
+script = ExtResource("3_trapmgr")
+
+[node name="TrapBuildController" type="Node" parent="System" unique_id=1231441992]
+script = ExtResource("4_tk58t")
+
+[node name="World" type="Node3D" parent="." unique_id=590027524]
+process_mode = 1
+
+[node name="EntityRoot" type="Node3D" parent="World" unique_id=1889090787]
+unique_name_in_owner = true
+
+[node name="EffectsRoot" type="Node3D" parent="World" unique_id=1024009966]
+unique_name_in_owner = true
+
+[node name="LevelRoot" type="Node3D" parent="World" unique_id=1058508975]
+unique_name_in_owner = true
+
+[node name="HudLayer" type="CanvasLayer" parent="." unique_id=266008980]
+process_mode = 1
+layer = 10
+
+[node name="HudRoot" type="Control" parent="HudLayer" unique_id=1769089304]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PauseLayer" type="CanvasLayer" parent="." unique_id=1158583654]
+process_mode = 2
+layer = 20
+
+[node name="PauseRoot" type="Control" parent="PauseLayer" unique_id=927009243]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TransitionLayer" type="CanvasLayer" parent="." unique_id=1186479427]
+process_mode = 3
+layer = 100
+
+[node name="TransitionRoot" type="Control" parent="TransitionLayer" unique_id=581567176]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DebugLayer" type="CanvasLayer" parent="." unique_id=1746342410]
+process_mode = 3
+layer = 128
+
+[node name="DebugRoot" type="Control" parent="DebugLayer" unique_id=1793069777]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DebugTextOverlay" parent="DebugLayer/DebugRoot" unique_id=1652090331 instance=ExtResource("2_6yl8a")]
+layout_mode = 1

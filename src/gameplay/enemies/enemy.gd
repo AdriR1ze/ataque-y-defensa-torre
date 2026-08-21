@@ -12,7 +12,8 @@ enum EnemyState {
 @export var gravity := 20.0
 @export var attack_range := 2.0
 @export var aggro_range := 20.0
-@export var attack_damage := 10.0
+@export var attack_damage := 3.0
+
 @export var attack_cooldown := 1.2
 @export var attack_duration := 0.3
 @export var knockback_force := 1.0
@@ -41,6 +42,9 @@ var _repath_timer := 0.0
 var _route: EnemyRoute
 var _route_points := PackedVector3Array()
 var _route_index := 0
+
+var is_cutscene_target := false
+var is_cinematic_death := false
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var hitbox_component: HitboxComponent = $HitboxComponent
@@ -147,11 +151,17 @@ func _find_target() -> void:
 	return
 
 
+
 func _is_chasing_player() -> bool:
-	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player := get_tree().get_first_node_in_group("player") as Player
 	if player == null:
 		return false
-	return global_position.distance_to(player.global_position) <= aggro_range
+	# Don't chase a dead player — fall back to the base route
+	if player.state == Player.PlayerState.DEAD:
+		return false
+	var dist_xz := Vector2(global_position.x - player.global_position.x, global_position.z - player.global_position.z).length()
+	return dist_xz <= aggro_range
+
 
 
 func _has_line_of_sight(target: Node3D) -> bool:
@@ -391,7 +401,54 @@ func _play_anim(anim_names: Array) -> void:
 			break
 
 
+signal cinematic_death_started(enemy: Enemy)
+
+
+func play_cinematic_death() -> void:
+	if is_cinematic_death:
+		return
+	is_cinematic_death = true
+	set_state(EnemyState.DEAD)
+	if hitbox_component != null:
+		hitbox_component.deactivate()
+	set_physics_process(false)
+	if collision_shape != null:
+		collision_shape.disabled = true
+	if is_in_group("enemies"):
+		remove_from_group("enemies")
+
+	Economy.add_money(reward)
+	cinematic_death_started.emit(self)
+
+	# Animación de impacto y caída dramática
+	var target_node: Node = mesh if mesh else model_node
+	if target_node != null:
+		var tween := create_tween().set_parallel(true)
+		tween.tween_property(target_node, "rotation:z", deg_to_rad(75.0), 0.55).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(target_node, "position:y", -0.25, 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+func finish_cinematic_death() -> void:
+	var target_node: Node = mesh if mesh else model_node
+	if target_node != null:
+		var tween := create_tween()
+		tween.tween_property(target_node, "scale", Vector3.ZERO, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		await tween.finished
+	queue_free()
+
+
 func _on_died() -> void:
+	if is_cinematic_death:
+		return
+	if is_cutscene_target:
+		play_cinematic_death()
+		return
+
+	var wave_mgr := get_tree().get_first_node_in_group("wave_manager") as Node
+	if wave_mgr != null and wave_mgr.has_method("should_intercept_enemy_death") and wave_mgr.should_intercept_enemy_death(self):
+		play_cinematic_death()
+		return
+
 	set_state(EnemyState.DEAD)
 	hitbox_component.deactivate()
 	Economy.add_money(reward)

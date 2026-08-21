@@ -183,7 +183,7 @@ func _refresh_slot(slot: int) -> void:
 	var icon: TextureRect = nodes["icon"]
 	var cost_label: Label = nodes["cost"]
 
-	var trap_id := trap_manager.get_slot_trap(slot)
+	var trap_id := trap_manager.get_equipped_trap_id(slot)
 
 	if trap_id == 0:
 		icon.texture = null

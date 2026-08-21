@@ -6,7 +6,7 @@ signal loadout_changed
 signal selected_slot_changed(slot: int)
 
 
-const TRAPS := {
+const ALL_TRAPS := {
 	1: preload("res://src/gameplay/traps/spikes_trap/spikes_trap.tres"),
 	2: preload("res://src/gameplay/traps/spike_launcher_trap/spike_launcher_trap.tres"),
 	3: preload("res://src/gameplay/traps/laser_trap/laser_trap.tres"),
@@ -54,16 +54,26 @@ const SLOT_LABELS := {
 const SLOT_COUNT := 10
 
 
-var trap_slots: Dictionary = {}
+var loadout: Dictionary = {}
 var selected_slot := 0
 
 
-func get_trap_ids() -> Array:
-	return TRAPS.keys()
+func get_available_trap_ids() -> Array:
+	var available: Array = []
+
+	for trap_id in ALL_TRAPS:
+		if Progress.has_blueprint(trap_id):
+			available.append(trap_id)
+
+	return available
+
+
+func is_trap_available(trap_id: int) -> bool:
+	return ALL_TRAPS.has(trap_id) and Progress.has_blueprint(trap_id)
 
 
 func get_trap(trap_id: int) -> TrapData:
-	return TRAPS.get(trap_id)
+	return ALL_TRAPS.get(trap_id)
 
 
 func get_slot_count() -> int:
@@ -74,44 +84,46 @@ func get_slot_labels() -> Dictionary:
 	return SLOT_LABELS.duplicate()
 
 
-func get_slot_trap(slot: int) -> int:
-	return trap_slots.get(slot, 0)
+func get_equipped_trap_id(slot: int) -> int:
+	return loadout.get(slot, 0)
 
 
-func set_slot_trap(slot: int, trap_id: int) -> void:
+func equip_trap(slot: int, trap_id: int) -> void:
 	if slot < 1 or slot > SLOT_COUNT:
 		return
 
-	if trap_id == 0 or not TRAPS.has(trap_id):
-		trap_slots.erase(slot)
+	if trap_id == 0:
+		loadout.erase(slot)
+	elif not is_trap_available(trap_id):
+		return
 	else:
-		trap_slots[slot] = trap_id
+		loadout[slot] = trap_id
 
 	loadout_changed.emit()
 
 
-func clear_selection() -> void:
-	trap_slots.clear()
+func clear_loadout() -> void:
+	loadout.clear()
 	selected_slot = 0
 
 	loadout_changed.emit()
 	selected_slot_changed.emit(selected_slot)
 
 
-func get_selection() -> Dictionary:
-	return trap_slots.duplicate()
+func get_loadout() -> Dictionary:
+	return loadout.duplicate()
 
 
-func apply_selection(selection: Dictionary) -> void:
-	trap_slots.clear()
+func apply_loadout(saved_loadout: Dictionary) -> void:
+	loadout.clear()
 
-	for slot in selection:
-		var trap_id: int = selection[slot]
+	for slot in saved_loadout:
+		var trap_id: int = saved_loadout[slot]
 
-		if TRAPS.has(trap_id):
-			trap_slots[slot] = trap_id
+		if is_trap_available(trap_id):
+			loadout[slot] = trap_id
 
-	if not trap_slots.has(selected_slot):
+	if not loadout.has(selected_slot):
 		selected_slot = 0
 
 	loadout_changed.emit()
@@ -122,7 +134,7 @@ func select_slot(slot: int) -> void:
 	if slot < 1 or slot > SLOT_COUNT:
 		return
 
-	if not trap_slots.has(slot):
+	if not loadout.has(slot):
 		return
 
 	selected_slot = slot
@@ -130,7 +142,7 @@ func select_slot(slot: int) -> void:
 
 
 func get_selected_trap_id() -> int:
-	return trap_slots.get(selected_slot, 0)
+	return loadout.get(selected_slot, 0)
 
 
 func get_selected_trap() -> TrapData:
@@ -143,12 +155,8 @@ func get_selected_trap() -> TrapData:
 
 
 func is_trap_equipped(trap_id: int) -> bool:
-	for equipped_id in trap_slots.values():
-		if equipped_id == trap_id:
-			return true
-
-	return false
+	return trap_id in loadout.values()
 
 
 func has_any_trap() -> bool:
-	return not trap_slots.is_empty()
+	return not loadout.is_empty()

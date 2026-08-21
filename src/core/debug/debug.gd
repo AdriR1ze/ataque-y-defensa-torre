@@ -4,6 +4,8 @@ signal debug_mode_changed(enabled: bool)
 
 var debug_enabled := false
 var selected_level_index: int = -1
+var active_custom_level_data: Dictionary = {}
+
 
 const LEVEL_SELECTOR_SCENE := preload("res://src/ui/level_selector_ui.tscn")
 

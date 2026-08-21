@@ -22,6 +22,7 @@ Debug="*res://src/core/debug/debug.gd"
 Economy="*res://src/core/economy/economy.gd"
 Settings="*res://src/core/settings/settings.gd"
 Music="*res://src/core/music/music.gd"
+Progress="*res://src/core/autoloads/Progress.gd"
 
 [display]
 

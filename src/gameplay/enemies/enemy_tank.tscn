@@ -4,7 +4,8 @@
 
 [node name="EnemyTank" instance=ExtResource("1_base")]
 move_speed = 1.8
-attack_damage = 20.0
+attack_damage = 5.0
+
 body_color = Color(0.2, 0.8, 0.4, 1)
 body_scale = 1.5
 max_health = 150.0

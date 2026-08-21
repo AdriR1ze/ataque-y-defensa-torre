@@ -138,6 +138,29 @@ func _build_ui() -> void:
 		btn.pressed.connect(func() -> void: _on_level_selected(index))
 		grid.add_child(btn)
 
+	# Custom Levels Section
+	var custom_levels := CustomLevelManager.list_custom_levels()
+	if not custom_levels.is_empty():
+		var custom_title := Label.new()
+		custom_title.text = "Niveles Personalizados:"
+		custom_title.add_theme_font_size_override("font_size", 14)
+		custom_title.add_theme_color_override("font_color", Color(0.4, 0.9, 1.0))
+		vbox.add_child(custom_title)
+
+		var custom_grid := GridContainer.new()
+		custom_grid.columns = 3
+		custom_grid.add_theme_constant_override("h_separation", 10)
+		custom_grid.add_theme_constant_override("v_separation", 10)
+		vbox.add_child(custom_grid)
+
+		for c_name in custom_levels:
+			var btn := Button.new()
+			btn.text = "🛠️ " + c_name
+			btn.custom_minimum_size = Vector2(130.0, 42.0)
+			var lvl_name := c_name
+			btn.pressed.connect(func(): _on_custom_level_selected(lvl_name))
+			custom_grid.add_child(btn)
+
 	# Close button
 	var close_btn := Button.new()
 	close_btn.text = "Cerrar"
@@ -145,6 +168,22 @@ func _build_ui() -> void:
 	close_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close_btn.pressed.connect(close)
 	vbox.add_child(close_btn)
+
+
+func _on_custom_level_selected(lvl_name: String) -> void:
+	var data := CustomLevelManager.load_level(lvl_name)
+	if data.is_empty():
+		return
+	Debug.active_custom_level_data = data
+	get_tree().paused = false
+
+	var main_game := get_tree().get_first_node_in_group("main_game") as Node
+	if main_game != null and main_game.has_method("load_custom_level"):
+		main_game.load_custom_level(data)
+	else:
+		get_tree().change_scene_to_file(MAIN_GAME_SCENE)
+	close()
+
 
 
 func _on_level_selected(index: int) -> void:

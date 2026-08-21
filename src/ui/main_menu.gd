@@ -41,14 +41,24 @@ func _build_ui() -> void:
 	spacer.custom_minimum_size = Vector2(0.0, 12.0)
 	panel.add_child(spacer)
 
+	const LEVEL_EDITOR_SCENE := "res://src/ui/level_editor/level_editor.tscn"
+
 	var play := Button.new()
 	play.text = "Jugar"
 	play.custom_minimum_size = Vector2(220.0, 48.0)
 	play.pressed.connect(_on_play_pressed)
 	panel.add_child(play)
 
+	var editor_btn := Button.new()
+	editor_btn.text = "Editor de Niveles"
+	editor_btn.custom_minimum_size = Vector2(220.0, 48.0)
+	editor_btn.add_theme_color_override("font_color", Color(0.4, 0.9, 1.0))
+	editor_btn.pressed.connect(func(): get_tree().change_scene_to_file(LEVEL_EDITOR_SCENE))
+	panel.add_child(editor_btn)
+
 	_debug_level_btn = Button.new()
 	_debug_level_btn.text = "Selector de Niveles (DEBUG)"
+
 	_debug_level_btn.custom_minimum_size = Vector2(220.0, 48.0)
 	_debug_level_btn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 	_debug_level_btn.pressed.connect(_on_debug_level_selector_pressed)

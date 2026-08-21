@@ -125,7 +125,7 @@ func toggle_build_mode() -> void:
 func _first_available_slot() -> int:
 	for slot in range(1, trap_manager.get_slot_count() + 1):
 
-		var trap_id := trap_manager.get_slot_trap(slot)
+		var trap_id := trap_manager.get_equipped_trap_id(slot)
 
 		if trap_id != 0:
 			return slot

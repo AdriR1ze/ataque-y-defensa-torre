@@ -15,6 +15,8 @@ const INITIAL_MONEY := 100
 
 var player: Player = null
 var _current_level: BaseLevel
+var _is_respawning := false
+
 
 const LEVELS: Array[String] = [
 	"res://src/levels/tutorial.tscn",
@@ -69,6 +71,11 @@ func _ready() -> void:
 	_setup_pause_menu()
 	_setup_end_screen()
 
+	if not Debug.active_custom_level_data.is_empty():
+		_show_trap_selection()
+		return
+
+
 	if Debug.selected_level_index >= 0:
 		_current_level_index = Debug.selected_level_index
 		Debug.selected_level_index = -1
@@ -79,12 +86,13 @@ func _ready() -> void:
 		_show_trap_selection()
 
 
+
 func _is_tutorial_level(level_path: String) -> bool:
 	return level_path.contains("tutorial")
 
 
 func _start_tutorial_directly() -> void:
-	trap_manager.apply_selection({})
+	trap_manager.apply_loadout({})
 	_grant_initial_money()
 
 	if _build_hud != null:
@@ -144,6 +152,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			_pause_game()
 		elif _state == GameState.PAUSED:
 			_resume_game()
+			return
+
+	if event is InputEventMouseButton and event.pressed:
+		if _state == GameState.PLAYING and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
 
 
 
@@ -185,6 +199,11 @@ func _show_trap_selection() -> void:
 	if player != null:
 		player.process_mode = Node.PROCESS_MODE_DISABLED
 
+	if not Debug.active_custom_level_data.is_empty():
+		var init_traps: Array = Debug.active_custom_level_data.get("initial_unlocked_traps", [1])
+		for tid in init_traps:
+			Progress.unlock_blueprint(int(tid))
+
 	_selection_ui = TRAP_SELECTION_UI.instantiate() as TrapSelectionUI
 
 	if _selection_ui == null:
@@ -200,13 +219,14 @@ func _show_trap_selection() -> void:
 	hud_root.add_child(_selection_ui)
 
 
+
 func _on_trap_selection_confirmed(
 	selection: Dictionary
 ) -> void:
 
 	_has_selected_traps = true
 
-	trap_manager.apply_selection(selection)
+	trap_manager.apply_loadout(selection)
 
 	_grant_initial_money()
 
@@ -220,6 +240,12 @@ func _on_trap_selection_confirmed(
 	_capture_mouse.call_deferred()
 
 	_state = GameState.PLAYING
+
+	if not Debug.active_custom_level_data.is_empty():
+		var custom_dict: Dictionary = Debug.active_custom_level_data
+		Debug.active_custom_level_data = {}
+		load_custom_level(custom_dict)
+		return
 
 	load_level(LEVELS[_current_level_index])
 
@@ -266,7 +292,7 @@ func load_next_level() -> void:
 	var next_scene: String = LEVELS[next_index]
 	_current_level_index = next_index
 
-	if not _is_tutorial_level(next_scene) and not _has_selected_traps:
+	if not _is_tutorial_level(next_scene):
 		_show_trap_selection()
 	else:
 		load_level(next_scene)
@@ -277,12 +303,51 @@ func _on_level_completed() -> void:
 		return
 	_clear_traps()
 	_grant_initial_money()
+
+	if _current_level != null and _current_level.has_meta("next_level"):
+		var next_lvl_name: String = str(_current_level.get_meta("next_level")).strip_edges()
+		if not next_lvl_name.is_empty():
+			var next_data := CustomLevelManager.load_level(next_lvl_name)
+			if not next_data.is_empty():
+				Debug.active_custom_level_data = next_data
+				_show_trap_selection()
+				return
+
 	load_next_level()
+
+
+
+func load_custom_level(data: Dictionary) -> void:
+	_state = GameState.PLAYING
+	if _current_level != null:
+		_stop_current_level()
+		_current_level.queue_free()
+		_current_level = null
+
+	await get_tree().process_frame
+
+	_current_level = CustomLevelBuilder.build_level_from_dict(data)
+	_current_level.level_completed.connect(_on_level_completed)
+	level_root.add_child(_current_level)
+
+	if _build_hud != null:
+		_build_hud.visible = true
+
+	await get_tree().process_frame
+
+	if player != null:
+		player.process_mode = Node.PROCESS_MODE_PAUSABLE
+		player.is_building = false
+
+	_capture_mouse.call_deferred()
+	_connect_base_destroyed()
+	_place_player_at_level_spawn()
 
 
 func _deferred_load_level(
 	level_scene: String
 ) -> void:
+
 
 	if _current_level != null:
 		_stop_current_level()
@@ -315,10 +380,15 @@ func _deferred_load_level(
 
 	await get_tree().process_frame
 
+	if player != null:
+		player.process_mode = Node.PROCESS_MODE_PAUSABLE
+		player.is_building = false
 
+	_capture_mouse.call_deferred()
 	_connect_base_destroyed()
 
 	_place_player_at_level_spawn()
+
 
 
 func _connect_base_destroyed() -> void:
@@ -335,9 +405,10 @@ func _connect_base_destroyed() -> void:
 func _stop_current_level() -> void:
 	if _current_level == null:
 		return
-	var wave_manager := _current_level.get_node_or_null("WaveManager") as WaveManager
-	if wave_manager != null:
+	var wave_manager: Node = _current_level.get_node_or_null("WaveManager")
+	if wave_manager != null and wave_manager.has_method("stop"):
 		wave_manager.stop()
+
 
 
 func _place_player_at_level_spawn() -> void:
@@ -374,7 +445,68 @@ func _resume_game() -> void:
 
 
 func _on_player_died() -> void:
-	_trigger_defeat("Has muerto")
+	if _is_respawning:
+		return
+	_is_respawning = true
+
+	if player != null:
+		player.velocity = Vector3.ZERO
+		# Disable collision so the corpse doesn't block enemies
+		var col := player.get_node_or_null("CollisionShape3D") as CollisionShape3D
+		if col != null:
+			col.disabled = true
+		# Move underground so enemies don't aggro the dead body
+		player.global_position = Vector3(player.global_position.x, -50.0, player.global_position.z)
+
+	# Show death / respawn screen
+	var respawn_screen := RespawnScreen.new()
+	hud_layer.add_child(respawn_screen)
+
+	# process_always=true so this timer works even if the tree gets paused
+	await get_tree().create_timer(3.0, true, false, true).timeout
+
+	respawn_screen.queue_free()
+	_respawn_player()
+
+
+
+
+func _respawn_player() -> void:
+	_is_respawning = false
+
+	if player == null:
+		return
+
+	# Re-enable collision
+	var col := player.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if col != null:
+		col.disabled = false
+
+	player.health_component.reset()
+	player.set_state(Player.PlayerState.IDLE)
+	player.velocity = Vector3.ZERO
+	player.global_position = _get_respawn_position()
+
+	player.process_mode = Node.PROCESS_MODE_PAUSABLE
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+
+func _get_respawn_position() -> Vector3:
+	# Use the dedicated PlayerSpawner marker placed in front of the base
+	if _current_level != null:
+		return _current_level.get_default_player_spawn()
+
+	# Fallback: 2 units beside the base node
+	var base := get_tree().get_first_node_in_group("base")
+	if base != null and base is Node3D:
+		return (base as Node3D).global_position + Vector3(2.0, 1.0, 0.0)
+
+	return Vector3.ZERO
+
+
+
+
 
 
 func _on_base_destroyed() -> void:
@@ -438,6 +570,8 @@ func _grant_initial_money() -> void:
 func _reset_player() -> void:
 	if player == null:
 		return
+	_is_respawning = false
+	player.process_mode = Node.PROCESS_MODE_PAUSABLE
 	player.health_component.reset()
 	player.set_state(Player.PlayerState.IDLE)
 	player.velocity = Vector3.ZERO

@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://c5e88y9edit0r"]
+
+[ext_resource type="Script" uid="uid://c5level_editor_script" path="res://src/ui/level_editor/level_editor.gd" id="1_editor"]
+[ext_resource type="MeshLibrary" uid="uid://1mju16ha4d43" path="res://src/resources/dungeon_tiles.tres" id="2_tiles"]
+
+[node name="LevelEditor" type="Node3D"]
+script = ExtResource("1_editor")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 15, 15)
+fov = 65.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 10, 0)
+light_color = Color(0.9, 0.92, 1, 1)
+light_energy = 1.0
+shadow_enabled = true
+
+[node name="GridMap" type="GridMap" parent="."]
+mesh_library = ExtResource("2_tiles")
+cell_size = Vector3(1, 1, 1)
+collision_mask = 7
+
+[node name="CursorPreview" type="MeshInstance3D" parent="."]
+
+[node name="Markers" type="Node3D" parent="."]

@@ -38,6 +38,10 @@ var card_nodes: Dictionary = {}
 
 func setup(manager: TrapManager) -> void:
 	trap_manager = manager
+	if trap_manager != null and trap_manager.loadout.is_empty():
+		var available := trap_manager.get_available_trap_ids()
+		if available.size() == 1:
+			trap_manager.equip_trap(1, available[0])
 	_build_ui()
 	_connect_manager()
 	_refresh()
@@ -590,7 +594,7 @@ func _build_cards() -> void:
 
 	card_nodes.clear()
 
-	for trap_id in trap_manager.get_trap_ids():
+	for trap_id in trap_manager.get_available_trap_ids():
 
 		var data := trap_manager.get_trap(trap_id)
 
@@ -665,13 +669,21 @@ func _on_trap_selected(trap_id: int) -> void:
 
 	info_panel.show_trap(data)
 
+	if trap_manager != null and not trap_manager.loadout.values().has(trap_id):
+		for slot in range(1, trap_manager.get_slot_count() + 1):
+			if not trap_manager.loadout.has(slot):
+				trap_manager.equip_trap(slot, trap_id)
+				_refresh()
+				break
+
+
 
 func _on_slot_pressed(slot: int) -> void:
 
 	if selected_card_id == 0:
 		return
 
-	trap_manager.set_slot_trap(
+	trap_manager.equip_trap(
 		slot,
 		selected_card_id
 	)
@@ -700,12 +712,12 @@ func _on_slot_dropped(
 	# Si ya existe en otro slot, la movemos.
 	if from_slot != 0 and from_slot != slot:
 
-		trap_manager.set_slot_trap(
+		trap_manager.equip_trap(
 			from_slot,
 			0
 		)
 
-	trap_manager.set_slot_trap(
+	trap_manager.equip_trap(
 		slot,
 		trap_id
 	)
@@ -715,18 +727,14 @@ func _on_slot_dropped(
 
 func _on_clear_pressed() -> void:
 
-	trap_manager.clear_selection()
+	trap_manager.clear_loadout()
 
 	_refresh()
 
 
 func _on_confirm_pressed() -> void:
-
-	if not trap_manager.has_any_trap():
-		return
-
 	selection_confirmed.emit(
-		trap_manager.get_selection()
+		trap_manager.get_loadout() if trap_manager != null else {}
 	)
 
 
@@ -750,7 +758,7 @@ func _refresh_slots() -> void:
 
 		var slot_node: TrapSlot = slot_nodes[slot]
 
-		var trap_id := trap_manager.get_slot_trap(
+		var trap_id := trap_manager.get_equipped_trap_id(
 			slot
 		)
 
@@ -769,4 +777,5 @@ func _refresh_slots() -> void:
 
 func _refresh_button() -> void:
 
-	confirm_button.disabled = not trap_manager.has_any_trap()
+	if confirm_button != null:
+		confirm_button.disabled = false
